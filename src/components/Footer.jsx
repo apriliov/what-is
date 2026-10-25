@@ -52,7 +52,7 @@ export default function Footer() {
         <div className="grid gap-10 md:grid-cols-[1.4fr_2fr]">
           <div>
             <a href="#top" className="mb-3 inline-flex items-center gap-3">
-              <img src="/logo-64.webp" alt="" width="36" height="36" loading="lazy" className="h-9 w-9 rounded-lg object-cover" />
+              <img src="/studio-64.webp" alt="" width="36" height="36" loading="lazy" className="h-9 w-9 rounded-lg object-cover" />
               <span className="text-base font-bold text-ink">{STUDIO_NAME}</span>
             </a>
             <p className="mb-3 max-w-xs text-sm text-mute">{t('footer.about')}</p>

@@ -22,7 +22,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b border-brand-line bg-white">
       <div className="wrap flex h-16 items-center justify-between gap-4">
         <a href="#top" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <img src="/logo-64.webp" alt="" width="40" height="40" className="h-10 w-10 rounded-lg object-cover" />
+          <img src="/studio-64.webp" alt="" width="40" height="40" className="h-10 w-10 rounded-lg object-cover" />
           <span className="text-base font-bold text-ink">{STUDIO_NAME}</span>
         </a>
 
