@@ -1,0 +1,213 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Batik accent: a few thin concentric arcs from a corner (like a batik ripple).
+   Simple on purpose, no dense repeating pattern. Only used as small accents:
+   --batik-card (blue) for .batik-corner cards, --batik-light (white) for hero bands. */
+:root {
+  --batik-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none' stroke='%23ffffff' stroke-width='1'%3E%3Ccircle cx='200' cy='0' r='36' stroke-opacity='0.55'/%3E%3Ccircle cx='200' cy='0' r='60' stroke-opacity='0.45'/%3E%3Ccircle cx='200' cy='0' r='84' stroke-opacity='0.35'/%3E%3Ccircle cx='200' cy='0' r='108' stroke-opacity='0.27'/%3E%3Ccircle cx='200' cy='0' r='132' stroke-opacity='0.2'/%3E%3Ccircle cx='200' cy='0' r='156' stroke-opacity='0.14'/%3E%3C/svg%3E");
+  --batik-card: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none' stroke='%231f5fd6' stroke-width='1'%3E%3Ccircle cx='200' cy='0' r='36' stroke-opacity='0.55'/%3E%3Ccircle cx='200' cy='0' r='60' stroke-opacity='0.45'/%3E%3Ccircle cx='200' cy='0' r='84' stroke-opacity='0.35'/%3E%3Ccircle cx='200' cy='0' r='108' stroke-opacity='0.27'/%3E%3Ccircle cx='200' cy='0' r='132' stroke-opacity='0.2'/%3E%3Ccircle cx='200' cy='0' r='156' stroke-opacity='0.14'/%3E%3C/svg%3E");
+}
+
+body {
+  background: #ffffff;
+  color: #0f1a30;
+  font-family: Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid #1f5fd6;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@layer components {
+  .wrap {
+    @apply mx-auto w-full max-w-5xl px-5;
+  }
+  .label {
+    @apply text-sm font-bold uppercase tracking-wider text-brand;
+  }
+  .heading {
+    @apply text-3xl font-extrabold leading-tight text-ink sm:text-4xl;
+  }
+  .card {
+    @apply relative isolate rounded-2xl border border-brand-line bg-white;
+  }
+  /* Batik corner: arcs from the top-right corner, behind the content (opt-in per card) */
+  .batik-corner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: inherit;
+    background-image: var(--batik-card);
+    background-repeat: no-repeat;
+    background-position: top right;
+    background-size: 200px 200px;
+    opacity: 0.8;
+    transition: opacity 0.25s ease;
+  }
+  .batik-corner:hover::before {
+    opacity: 1;
+  }
+  /* Hero band ornaments (white arcs on the blue band) */
+  .batik-hero {
+    position: absolute;
+    width: 20rem;
+    height: 20rem;
+    pointer-events: none;
+    background-image: var(--batik-light);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    opacity: 0.7;
+  }
+  .batik-hero-tr {
+    top: 0;
+    right: 0;
+  }
+  .batik-hero-bl {
+    bottom: 0;
+    left: 0;
+    transform: rotate(180deg);
+  }
+  @media (max-width: 639px) {
+    .batik-hero { width: 11rem; height: 11rem; }
+  }
+
+  .btn {
+    @apply inline-flex h-11 items-center justify-center gap-2 rounded-lg px-5 text-sm font-semibold transition-colors;
+  }
+  .btn-primary {
+    @apply bg-brand text-white hover:bg-brand-dark;
+  }
+  .btn-outline {
+    @apply border border-brand-line bg-brand-soft text-ink hover:border-brand;
+  }
+  .section {
+    @apply py-16 sm:py-20;
+  }
+}
+
+/* Notes Wall */
+.note-tray {
+  position: relative;
+  border-radius: 2rem;
+  padding: 0.75rem;
+  background: linear-gradient(160deg, #d6e4fb 0%, #c9dafa 100%);
+  border: 1px solid #bcd0f3;
+  box-shadow: 0 18px 40px -22px rgba(31, 95, 214, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+.note-tray-inner {
+  border-radius: 1.5rem;
+  padding: 1.25rem 0.9rem 1rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.18));
+  box-shadow: inset 0 2px 10px rgba(31, 95, 214, 0.12);
+}
+@media (min-width: 640px) {
+  .note-tray { padding: 1rem; }
+  .note-tray-inner { padding: 1.5rem 1.25rem 1.25rem; }
+}
+
+.note {
+  --note-bg: #d3e8ff;
+  --note-fold: #bcd8f6;
+  position: relative;
+  display: flex;
+  min-height: 9rem;
+  flex-direction: column;
+  border-radius: 0.875rem;
+  padding: 1.5rem 1rem 1.7rem;
+  color: #1c2740;
+  background-color: var(--note-bg);
+  box-shadow: 0 8px 18px -10px rgba(25, 60, 130, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.note::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 0.7rem;
+  border-radius: 0 0 0.875rem 0.875rem;
+  background-color: var(--note-fold);
+}
+.note:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 24px -10px rgba(25, 60, 130, 0.4);
+}
+.note-text {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.note-name {
+  margin-top: auto;
+  padding-top: 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #5a6a88;
+}
+/* Tape: half on the card, half outside, like it is stuck to the wall */
+.note-tape {
+  position: absolute;
+  top: -0.5rem;
+  left: 50%;
+  z-index: 1;
+  height: 1rem;
+  width: 3.6rem;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 1px 3px rgba(25, 60, 130, 0.22);
+}
+.note-sky    { --note-bg: #d3e8ff; --note-fold: #bcd8f6; }
+.note-lilac  { --note-bg: #e4e4ff; --note-fold: #d3d3f7; }
+.note-mint   { --note-bg: #cff3f3; --note-fold: #b6e4e6; }
+.note-white  { --note-bg: #f7faff; --note-fold: #e3eaf6; }
+.note-blue   { --note-bg: #c3dafd; --note-fold: #adc9f5; }
+
+.note-empty {
+  display: flex;
+  min-height: 9rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.875rem;
+  font-size: 1.25rem;
+  color: rgba(86, 100, 128, 0.55);
+  background: rgba(176, 200, 240, 0.45);
+  box-shadow: inset 0 2px 8px rgba(31, 95, 214, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note { transition: none; }
+  .note:hover { transform: none; }
+}
+
+/* Marquee strips */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.marquee-left { animation: marquee-left 40s linear infinite; }
+.marquee-right { animation: marquee-right 48s linear infinite; }
+.marquee:hover .marquee-left,
+.marquee:hover .marquee-right { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .marquee-left, .marquee-right { animation: none; }
+}
