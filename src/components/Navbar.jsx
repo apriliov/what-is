@@ -2,26 +2,54 @@ import { useEffect, useState } from 'react';
 import { FaDiscord } from 'react-icons/fa';
 import { FiMenu, FiX } from 'react-icons/fi';
 import { useLang } from '../i18n.jsx';
+import { HomeLink, Link, usePath } from '../router.jsx';
 import LangSwitch from './LangSwitch';
 import { SUPPORT_URL, STUDIO_NAME } from '../config';
 
-const LINKS = ['about', 'projects', 'recruitment', 'notes', 'location', 'faq'];
+// `to` = separate page, otherwise a section of the home page.
+const LINKS = [
+  { id: 'about' },
+  { id: 'projects' },
+  { id: 'recruitment', to: '/recruitment', isNew: true },
+  { id: 'notes' },
+  { id: 'location' },
+  { id: 'faq' },
+];
 
-function NavLabel({ id }) {
+function NavItem({ link, className, onNavigate }) {
   const { t } = useLang();
-  return (
+  const path = usePath();
+  const label = (
     <>
-      {t(`nav.${id}`)}
-      {id === 'recruitment' && (
-        <sup className="ml-1 text-[10px] font-extrabold tracking-wide text-brand">{t('nav.new')}</sup>
-      )}
+      {t(`nav.${link.id}`)}
+      {link.isNew && <sup className="ml-1 text-[10px] font-extrabold tracking-wide text-brand">{t('nav.new')}</sup>}
     </>
+  );
+
+  if (link.to) {
+    const active = path === link.to;
+    return (
+      <Link
+        to={link.to}
+        onClick={onNavigate}
+        aria-current={active ? 'page' : undefined}
+        className={`${className} ${active ? '!text-brand' : ''}`}
+      >
+        {label}
+      </Link>
+    );
+  }
+  return (
+    <HomeLink hash={link.id} onClick={onNavigate} className={className}>
+      {label}
+    </HomeLink>
   );
 }
 
 export default function Navbar() {
   const { t } = useLang();
   const [open, setOpen] = useState(false);
+  const close = () => setOpen(false);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -33,16 +61,18 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-brand-line bg-white">
       <div className="wrap flex h-16 items-center justify-between gap-4">
-        <a href="#top" className="flex items-center gap-3" onClick={() => setOpen(false)}>
+        <HomeLink hash="top" className="flex items-center gap-3" onClick={close}>
           <img src="/studio-64.webp" alt="" width="40" height="40" className="h-10 w-10 rounded-lg object-cover" />
           <span className="text-base font-bold text-ink">{STUDIO_NAME}</span>
-        </a>
+        </HomeLink>
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
-          {LINKS.map((id) => (
-            <a key={id} href={`#${id}`} className="rounded-lg px-3 py-2 text-sm font-medium text-mute hover:text-brand">
-              <NavLabel id={id} />
-            </a>
+          {LINKS.map((link) => (
+            <NavItem
+              key={link.id}
+              link={link}
+              className="rounded-lg px-3 py-2 text-sm font-medium text-mute hover:text-brand"
+            />
           ))}
           <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary ml-2 h-10">
             <FaDiscord size={16} /> {t('nav.join')}
@@ -64,15 +94,13 @@ export default function Navbar() {
       {open && (
         <div id="mobile-menu" className="border-t border-brand-line bg-white lg:hidden">
           <nav className="wrap flex flex-col py-2" aria-label="Mobile">
-            {LINKS.map((id) => (
-              <a
-                key={id}
-                href={`#${id}`}
-                onClick={() => setOpen(false)}
+            {LINKS.map((link) => (
+              <NavItem
+                key={link.id}
+                link={link}
+                onNavigate={close}
                 className="border-b border-brand-line/70 py-3.5 text-base font-medium text-ink"
-              >
-                <NavLabel id={id} />
-              </a>
+              />
             ))}
             <div className="flex items-center justify-between gap-3 py-4">
               <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary">

@@ -1,5 +1,6 @@
 import { useLang } from '../i18n.jsx';
 import LangSwitch from './LangSwitch';
+import { HomeLink, Link } from '../router.jsx';
 import {
   SUPPORT_URL, SUPPORT_EMAIL, STUDIO_NAME, COPYRIGHT_YEAR, OWNER_NAME, OWNER_URL,
   NAMAIKI_URL, NAMAIKI_PRIVACY_URL, NAMAIKI_TERMS_URL, PRESIDENT_URL,
@@ -12,13 +13,17 @@ function Column({ title, links }) {
       <ul className="flex flex-col gap-2">
         {links.map((l) => (
           <li key={l.label}>
-            <a
-              href={l.href}
-              {...(l.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-              className="text-sm text-mute hover:text-brand"
-            >
-              {l.label}
-            </a>
+            {l.to && <Link to={l.to} className="text-sm text-mute hover:text-brand">{l.label}</Link>}
+            {l.hash && <HomeLink hash={l.hash} className="text-sm text-mute hover:text-brand">{l.label}</HomeLink>}
+            {l.href && (
+              <a
+                href={l.href}
+                {...(l.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                className="text-sm text-mute hover:text-brand"
+              >
+                {l.label}
+              </a>
+            )}
           </li>
         ))}
       </ul>
@@ -30,12 +35,12 @@ export default function Footer() {
   const { t } = useLang();
 
   const pages = [
-    { label: t('nav.about'), href: '#about' },
-    { label: t('nav.projects'), href: '#projects' },
-    { label: t('nav.recruitment'), href: '#recruitment' },
-    { label: t('nav.notes'), href: '#notes' },
-    { label: t('nav.location'), href: '#location' },
-    { label: t('nav.faq'), href: '#faq' },
+    { label: t('nav.about'), hash: 'about' },
+    { label: t('nav.projects'), hash: 'projects' },
+    { label: t('nav.recruitment'), to: '/recruitment' },
+    { label: t('nav.notes'), hash: 'notes' },
+    { label: t('nav.location'), hash: 'location' },
+    { label: t('nav.faq'), hash: 'faq' },
   ];
   const bots = [
     { label: 'Namaiki', href: NAMAIKI_URL, external: true },
@@ -52,10 +57,10 @@ export default function Footer() {
       <div className="wrap py-12">
         <div className="grid gap-10 md:grid-cols-[1.4fr_2fr]">
           <div>
-            <a href="#top" className="mb-3 inline-flex items-center gap-3">
+            <HomeLink hash="top" className="mb-3 inline-flex items-center gap-3">
               <img src="/studio-64.webp" alt="" width="36" height="36" loading="lazy" className="h-9 w-9 rounded-lg object-cover" />
               <span className="text-base font-bold text-ink">{STUDIO_NAME}</span>
-            </a>
+            </HomeLink>
             <p className="mb-3 max-w-xs text-sm text-mute">{t('footer.about')}</p>
             <a href={`mailto:${SUPPORT_EMAIL}`} className="text-sm font-medium text-brand hover:underline">
               {SUPPORT_EMAIL}
