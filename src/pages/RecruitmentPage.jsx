@@ -1,11 +1,12 @@
 import { useLang } from '../i18n.jsx';
 import Recruitment from '../sections/Recruitment';
+import RecruitStats from '../components/RecruitStats';
 
 export default function RecruitmentPage() {
   const { t } = useLang();
   return (
     <>
-      <section id="top" className="relative overflow-hidden bg-brand pb-16 pt-14 text-center text-white sm:pb-20 sm:pt-20">
+      <section id="top" className="relative overflow-hidden bg-brand pb-28 pt-14 text-center text-white sm:pb-32 sm:pt-20">
         <span className="batik-hero batik-hero-tr" aria-hidden="true" />
         <span className="batik-hero batik-hero-bl" aria-hidden="true" />
         <div className="wrap relative">
@@ -15,6 +16,7 @@ export default function RecruitmentPage() {
           <a href="#roles" className="btn mt-7 bg-white text-brand hover:bg-brand-soft">{t('recruit.rolesTitle')}</a>
         </div>
       </section>
+      <RecruitStats />
       <Recruitment />
     </>
   );
