@@ -151,7 +151,14 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <div id="mobile-menu" className="border-t border-brand-line bg-white lg:hidden">
+        <>
+        {/* Dim backdrop under the header; tapping it closes the menu */}
+        <div className="fixed inset-x-0 bottom-0 top-16 bg-ink/25 lg:hidden" onClick={close} aria-hidden="true" />
+        {/* Menu floats over the page instead of pushing the content down */}
+        <div
+          id="mobile-menu"
+          className="absolute inset-x-0 top-full max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-t border-brand-line bg-white shadow-[0_18px_30px_-20px_rgba(15,26,48,0.45)] lg:hidden"
+        >
           <nav className="wrap flex flex-col py-2" aria-label="Mobile">
             {LINKS.map((link) => (
               <NavItem
@@ -170,6 +177,7 @@ export default function Navbar() {
             </div>
           </nav>
         </div>
+        </>
       )}
     </header>
   );
