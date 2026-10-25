@@ -4,7 +4,14 @@ import { useEffect, useState } from 'react';
 const EVENT = 'nd-navigate';
 
 const clean = (p) => p.replace(/\/+$/, '') || '/';
-const currentPath = () => clean(window.location.pathname);
+// Some hosts serve the app at /index.html, treat that as the home page.
+const currentPath = () => {
+  const p = clean(window.location.pathname);
+  return p === '/index.html' ? '/' : p;
+};
+
+export const KNOWN_PATHS = ['/', '/recruitment'];
+export const isKnownPath = (p) => KNOWN_PATHS.includes(p);
 
 export function navigate(to) {
   const url = new URL(to, window.location.origin);

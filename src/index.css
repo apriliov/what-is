@@ -275,8 +275,8 @@ html {
   from { transform: translateX(-50%); }
   to { transform: translateX(0); }
 }
-.marquee-left { animation: marquee-left 40s linear infinite; }
-.marquee-right { animation: marquee-right 48s linear infinite; }
+.marquee-left { animation: marquee-left 40s linear infinite; will-change: transform; }
+.marquee-right { animation: marquee-right 48s linear infinite; will-change: transform; }
 .marquee:hover .marquee-left,
 .marquee:hover .marquee-right { animation-play-state: paused; }
 
@@ -317,5 +317,14 @@ html {
   }
   details.card[open]::details-content {
     block-size: auto;
+  }
+}
+
+/* Printing / saving as PDF: never leave content hidden by the reveal effect */
+@media print {
+  .reveal-ready .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 }

@@ -10,7 +10,8 @@ import Location from './sections/Location';
 import Faq from './sections/Faq';
 import Team from './sections/Team';
 import RecruitmentPage from './pages/RecruitmentPage';
-import { usePath, jumpTo } from './router.jsx';
+import NotFoundPage from './pages/NotFoundPage';
+import { usePath, jumpTo, isKnownPath } from './router.jsx';
 import { useReveal } from './hooks';
 import { STUDIO_NAME } from './config';
 
@@ -28,7 +29,9 @@ export default function App() {
     <div className="flex min-h-screen flex-col overflow-x-clip">
       <Navbar />
       <main className="flex-1" aria-label={STUDIO_NAME}>
-        {path === '/recruitment' ? (
+        {!isKnownPath(path) ? (
+          <NotFoundPage />
+        ) : path === '/recruitment' ? (
           <RecruitmentPage />
         ) : (
           <>

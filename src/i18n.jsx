@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { usePath } from './router.jsx';
+import { usePath, isKnownPath } from './router.jsx';
 import { SITE_URL } from './config';
 
 export const LANGS = ['en', 'id'];
@@ -8,6 +8,8 @@ const STORAGE_KEY = 'nd-lang';
 const en = {
   meta: {
     htmlLang: 'en',
+    ogLocale: 'en_US',
+    notFoundTitle: 'Page not found | Namaiki Development',
     title: 'Namaiki Development | Discord bot studio from Majalengka, Indonesia',
     recruitTitle: 'Recruitment | Namaiki Development',
     recruitDesc: 'Join Namaiki Development. See the selection stages and open roles for Discord bot developers, web developers, designers and moderators.',
@@ -133,6 +135,7 @@ const en = {
     apply: 'Apply via email',
     closedBtn: 'Applications closed',
     closedNote: 'All roles are closed for now. Join our Discord server to hear when we open again.',
+    emailNote: 'Prefer to write the email yourself? Send it to',
     mailSubject: 'Application',
     mailBody: 'Name:\nRole:\nCV / portfolio link:\nWhy do you want to join:\n',
     roles: {
@@ -248,6 +251,16 @@ const en = {
       },
     ],
   },
+  common: {
+    copy: 'Copy',
+    copied: 'Copied',
+    copyFailed: 'Could not copy',
+  },
+  notFound: {
+    title: 'Page not found',
+    desc: 'The page you are looking for does not exist or has moved.',
+    home: 'Back to home',
+  },
   footer: {
     about: 'Independent Discord bot studio from Majalengka, Indonesia.',
     pages: 'Pages',
@@ -266,6 +279,8 @@ const en = {
 const id = {
   meta: {
     htmlLang: 'id',
+    ogLocale: 'id_ID',
+    notFoundTitle: 'Halaman tidak ditemukan | Namaiki Development',
     title: 'Namaiki Development | Studio bot Discord dari Majalengka, Indonesia',
     recruitTitle: 'Rekrutmen | Namaiki Development',
     recruitDesc: 'Gabung Namaiki Development. Lihat tahapan seleksi dan posisi untuk developer bot Discord, web developer, desainer, dan moderator.',
@@ -391,6 +406,7 @@ const id = {
     apply: 'Daftar lewat email',
     closedBtn: 'Pendaftaran Ditutup',
     closedNote: 'Semua posisi sedang ditutup. Gabung server Discord kami untuk tahu kapan dibuka lagi.',
+    emailNote: 'Mau menulis email sendiri? Kirim ke',
     mailSubject: 'Lamaran',
     mailBody: 'Nama:\nPosisi:\nLink CV / portofolio:\nAlasan ingin bergabung:\n',
     roles: {
@@ -506,6 +522,16 @@ const id = {
       },
     ],
   },
+  common: {
+    copy: 'Salin',
+    copied: 'Tersalin',
+    copyFailed: 'Gagal menyalin',
+  },
+  notFound: {
+    title: 'Halaman tidak ditemukan',
+    desc: 'Halaman yang kamu cari tidak ada atau sudah dipindahkan.',
+    home: 'Kembali ke beranda',
+  },
   footer: {
     about: 'Studio bot Discord independen dari Majalengka, Indonesia.',
     pages: 'Halaman',
@@ -530,7 +556,14 @@ function getSavedLang() {
   } catch {
     // storage can be blocked, fall through to the browser language
   }
-  return (navigator.language || '').toLowerCase().startsWith('id') ? 'id' : 'en';
+  // First language in the browser's preference list that we have. "in" is the old code for Indonesian.
+  const prefs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
+  for (const l of prefs) {
+    const code = String(l).toLowerCase();
+    if (code.startsWith('id') || code === 'in' || code.startsWith('in-')) return 'id';
+    if (code.startsWith('en')) return 'en';
+  }
+  return 'en';
 }
 
 function resolve(dict, path) {
@@ -556,13 +589,30 @@ export function LangProvider({ children }) {
 
   useEffect(() => {
     const meta = TRANSLATIONS[lang].meta;
+    const known = isKnownPath(path);
     const recruit = path === '/recruitment';
+    const title = !known ? meta.notFoundTitle : recruit ? meta.recruitTitle : meta.title;
+    const desc = recruit ? meta.recruitDesc : meta.desc;
+    const setMeta = (selector, value) => {
+      const el = document.querySelector(selector);
+      if (el) el.setAttribute('content', value);
+    };
+
     document.documentElement.lang = meta.htmlLang;
-    document.title = recruit ? meta.recruitTitle : meta.title;
-    const el = document.querySelector('meta[name="description"]');
-    if (el) el.setAttribute('content', recruit ? meta.recruitDesc : meta.desc);
+    document.title = title;
+    setMeta('meta[name="description"]', desc);
+    setMeta('meta[property="og:title"]', title);
+    setMeta('meta[property="og:description"]', desc);
+    setMeta('meta[property="og:locale"]', meta.ogLocale);
+    setMeta('meta[name="twitter:title"]', title);
+    setMeta('meta[name="twitter:description"]', desc);
+    // Unknown pages must not be indexed.
+    setMeta('meta[name="robots"]', known ? 'index, follow' : 'noindex, follow');
+
+    const url = `${SITE_URL}${recruit ? '/recruitment' : '/'}`;
     const canonical = document.querySelector('link[rel="canonical"]');
-    if (canonical) canonical.setAttribute('href', `${SITE_URL}${recruit ? '/recruitment' : '/'}`);
+    if (canonical) canonical.setAttribute('href', url);
+    setMeta('meta[property="og:url"]', url);
   }, [lang, path]);
 
   const value = useMemo(() => {
