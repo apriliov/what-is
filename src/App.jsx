@@ -1,28 +1,43 @@
+import { useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Hero from './sections/Hero';
 import Marquee from './sections/Marquee';
 import About from './sections/About';
 import Projects from './sections/Projects';
-import Recruitment from './sections/Recruitment';
 import Notes from './sections/Notes';
 import Location from './sections/Location';
 import Faq from './sections/Faq';
+import RecruitmentPage from './pages/RecruitmentPage';
+import { usePath, jumpTo } from './router.jsx';
 import { STUDIO_NAME } from './config';
 
 export default function App() {
+  const path = usePath();
+
+  // After changing page: go to the #section in the URL, or to the top.
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    jumpTo(id ? document.getElementById(id) : null);
+  }, [path]);
+
   return (
     <div className="flex min-h-screen flex-col overflow-x-clip">
       <Navbar />
       <main className="flex-1" aria-label={STUDIO_NAME}>
-        <Hero />
-        <Marquee />
-        <About />
-        <Projects />
-        <Recruitment />
-        <Notes />
-        <Location />
-        <Faq />
+        {path === '/recruitment' ? (
+          <RecruitmentPage />
+        ) : (
+          <>
+            <Hero />
+            <Marquee />
+            <About />
+            <Projects />
+            <Notes />
+            <Location />
+            <Faq />
+          </>
+        )}
       </main>
       <Footer />
     </div>

@@ -1,4 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { usePath } from './router.jsx';
+import { SITE_URL } from './config';
 
 export const LANGS = ['en', 'id'];
 const STORAGE_KEY = 'nd-lang';
@@ -7,6 +9,8 @@ const en = {
   meta: {
     htmlLang: 'en',
     title: 'Namaiki Development | Discord bot studio from Majalengka, Indonesia',
+    recruitTitle: 'Recruitment | Namaiki Development',
+    recruitDesc: 'Join Namaiki Development. See the selection stages and open roles for Discord bot developers, web developers, designers and moderators.',
     desc: 'Namaiki Development is an independent studio from Majalengka, Indonesia. We build Discord bots and web dashboards, including Namaiki and President.',
   },
   nav: {
@@ -235,6 +239,8 @@ const id = {
   meta: {
     htmlLang: 'id',
     title: 'Namaiki Development | Studio bot Discord dari Majalengka, Indonesia',
+    recruitTitle: 'Rekrutmen | Namaiki Development',
+    recruitDesc: 'Gabung Namaiki Development. Lihat tahapan seleksi dan posisi untuk developer bot Discord, web developer, desainer, dan moderator.',
     desc: 'Namaiki Development adalah studio independen dari Majalengka, Indonesia. Kami membuat bot Discord dan dashboard web, termasuk Namaiki dan President.',
   },
   nav: {
@@ -490,13 +496,18 @@ export function LangProvider({ children }) {
     }
   }, []);
 
+  const path = usePath();
+
   useEffect(() => {
-    const { htmlLang, title, desc } = TRANSLATIONS[lang].meta;
-    document.documentElement.lang = htmlLang;
-    document.title = title;
+    const meta = TRANSLATIONS[lang].meta;
+    const recruit = path === '/recruitment';
+    document.documentElement.lang = meta.htmlLang;
+    document.title = recruit ? meta.recruitTitle : meta.title;
     const el = document.querySelector('meta[name="description"]');
-    if (el) el.setAttribute('content', desc);
-  }, [lang]);
+    if (el) el.setAttribute('content', recruit ? meta.recruitDesc : meta.desc);
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.setAttribute('href', `${SITE_URL}${recruit ? '/recruitment' : '/'}`);
+  }, [lang, path]);
 
   const value = useMemo(() => {
     const dict = TRANSLATIONS[lang];
