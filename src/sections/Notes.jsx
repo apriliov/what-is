@@ -2,13 +2,13 @@ import { useLang } from '../i18n.jsx';
 import { NOTES } from '../notes';
 import NoteForm from '../components/NoteForm';
 
-// Tone for each note. "white" has no tape, like a plain sheet.
 const TONES = ['sky', 'lilac', 'mint', 'white', 'blue'];
-const MIN_SLOTS = 6;
+const MAX_NOTES = 6;
 
 export default function Notes() {
   const { t } = useLang();
-  const empty = Math.max(0, MIN_SLOTS - NOTES.length);
+  const shown = NOTES.slice(0, MAX_NOTES);
+  const empty = MAX_NOTES - shown.length;
 
   return (
     <section id="notes" className="section border-t border-brand-line bg-brand-soft">
@@ -21,19 +21,16 @@ export default function Notes() {
 
         <div className="note-tray">
           <div className="note-tray-inner">
-            <ul className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:gap-4 md:grid-cols-3">
-              {NOTES.map((note, i) => {
-                const tone = TONES[i % TONES.length];
-                return (
-                  <li key={`${i}-${note.text.slice(0, 12)}`} className={`note note-${tone}`}>
-                    {tone !== 'white' && <span className="note-tape" aria-hidden="true" />}
-                    <p className="note-text">{note.text}</p>
-                    <p className="note-name">&mdash; {note.name || t('notes.anon')}</p>
-                  </li>
-                );
-              })}
+            <ul className="grid grid-cols-2 gap-x-3 gap-y-5 sm:gap-x-4 sm:gap-y-6 md:grid-cols-3">
+              {shown.map((note, i) => (
+                <li key={`${i}-${note.text.slice(0, 12)}`} className={`note note-${TONES[i % TONES.length]}`}>
+                  <span className="note-tape" aria-hidden="true" />
+                  <p className="note-text">{note.text}</p>
+                  <p className="note-name">&mdash; {note.name || t('notes.anon')}</p>
+                </li>
+              ))}
               {Array.from({ length: empty }, (_, i) => (
-                <li key={`empty-${i}`} className="note-empty" aria-hidden="true" />
+                <li key={`empty-${i}`} className="note-empty" aria-hidden="true">-</li>
               ))}
             </ul>
           </div>
