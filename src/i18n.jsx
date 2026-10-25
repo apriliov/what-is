@@ -258,6 +258,8 @@ const en = {
     terms: 'Terms of Service',
     rights: 'All rights reserved.',
     language: 'Language',
+    ctaTitle: 'Got a question or an idea?',
+    ctaDesc: 'Drop by our Discord server and talk to us.',
   },
 };
 
@@ -514,6 +516,8 @@ const id = {
     terms: 'Ketentuan Layanan',
     rights: 'Hak cipta dilindungi.',
     language: 'Bahasa',
+    ctaTitle: 'Punya pertanyaan atau ide?',
+    ctaDesc: 'Mampir ke server Discord kami dan ngobrol bareng.',
   },
 };
 

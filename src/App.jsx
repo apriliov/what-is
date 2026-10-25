@@ -11,10 +11,12 @@ import Faq from './sections/Faq';
 import Team from './sections/Team';
 import RecruitmentPage from './pages/RecruitmentPage';
 import { usePath, jumpTo } from './router.jsx';
+import { useReveal } from './hooks';
 import { STUDIO_NAME } from './config';
 
 export default function App() {
   const path = usePath();
+  useReveal(path);
 
   // After changing page: go to the #section in the URL, or to the top.
   useEffect(() => {
