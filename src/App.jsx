@@ -8,6 +8,7 @@ import Projects from './sections/Projects';
 import Notes from './sections/Notes';
 import Location from './sections/Location';
 import Faq from './sections/Faq';
+import Team from './sections/Team';
 import RecruitmentPage from './pages/RecruitmentPage';
 import { usePath, jumpTo } from './router.jsx';
 import { STUDIO_NAME } from './config';
@@ -36,6 +37,7 @@ export default function App() {
             <Notes />
             <Location />
             <Faq />
+            <Team />
           </>
         )}
       </main>

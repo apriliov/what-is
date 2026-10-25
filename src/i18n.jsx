@@ -17,6 +17,7 @@ const en = {
     about: 'About',
     projects: 'Projects',
     recruitment: 'Recruitment',
+    team: 'Team',
     new: 'NEW!',
     notes: 'Notes',
     location: 'Location',
@@ -86,6 +87,30 @@ const en = {
   marquee: {
     row1: ['Discord bots', 'Websites & dashboards', 'Indie studio', 'Majalengka, Indonesia', 'Namaiki', 'President', 'Support server'],
     row2: ['Leveling', 'Economy', 'Mini-games', 'Giveaways', 'Slash commands', 'Web dashboard', 'Nation-building game'],
+  },
+  team: {
+    label: 'Team',
+    title: 'Meet the team',
+    desc: 'The people behind Namaiki Development, from the bots and websites to the community.',
+    discord: 'Discord profile',
+    members: {
+      lio: {
+        role: 'Owner & Developer',
+        desc: 'Builds and runs the Namaiki and President bots, and the websites around them.',
+      },
+      kenzio: {
+        role: 'UI/UX Designer',
+        desc: 'Designs the look and feel of our bots and websites so they stay clean and easy to use.',
+      },
+      amalia: {
+        role: 'Moderator Support',
+        desc: 'Helps keep the community friendly and active as part of the moderation team.',
+      },
+      gibran: {
+        role: 'Support Server Admin',
+        desc: 'Looks after the support server and helps members with questions and reports.',
+      },
+    },
   },
   recruit: {
     label: 'Recruitment',
@@ -247,7 +272,8 @@ const id = {
     about: 'Tentang',
     projects: 'Proyek',
     recruitment: 'Rekrutmen',
-    new: 'BARU!',
+    team: 'Tim',
+    new: 'NEW!',
     notes: 'Catatan',
     location: 'Lokasi',
     faq: 'FAQ',
@@ -316,6 +342,30 @@ const id = {
   marquee: {
     row1: ['Bot Discord', 'Website & dashboard', 'Studio indie', 'Majalengka, Indonesia', 'Namaiki', 'President', 'Server support'],
     row2: ['Leveling', 'Ekonomi', 'Mini-game', 'Giveaway', 'Slash command', 'Dashboard web', 'Game bangun negara'],
+  },
+  team: {
+    label: 'Tim',
+    title: 'Kenalan dengan Tim',
+    desc: 'Orang-orang di balik Namaiki Development, dari bot dan website sampai komunitasnya.',
+    discord: 'Profil Discord',
+    members: {
+      lio: {
+        role: 'Owner & Developer',
+        desc: 'Membangun dan menjalankan bot Namaiki dan President, beserta website pendukungnya.',
+      },
+      kenzio: {
+        role: 'UI/UX Designer',
+        desc: 'Merancang tampilan bot dan website kami supaya tetap bersih dan mudah dipakai.',
+      },
+      amalia: {
+        role: 'Moderator Support',
+        desc: 'Membantu menjaga komunitas tetap ramah dan aktif sebagai bagian dari tim moderasi.',
+      },
+      gibran: {
+        role: 'Admin Support Server',
+        desc: 'Mengurus server support dan membantu member yang punya pertanyaan atau laporan.',
+      },
+    },
   },
   recruit: {
     label: 'Rekrutmen',
