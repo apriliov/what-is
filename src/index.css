@@ -8,11 +8,12 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
-/* Batik kawung motif: hairline ellipses. Used only as small accents, never page-wide:
-   --batik-card (blue) for .batik-corner cards, --batik-light (white) for the hero band. */
+/* Batik accent: a few thin concentric arcs from a corner (like a batik ripple).
+   Simple on purpose, no dense repeating pattern. Only used as small accents:
+   --batik-card (blue) for .batik-corner cards, --batik-light (white) for hero bands. */
 :root {
-  --batik-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40' fill='none' stroke='%23ffffff' stroke-opacity='0.55' stroke-width='1'%3E%3Cellipse cx='20' cy='10' rx='5' ry='10'/%3E%3Cellipse cx='20' cy='30' rx='5' ry='10'/%3E%3Cellipse cx='10' cy='20' rx='10' ry='5'/%3E%3Cellipse cx='30' cy='20' rx='10' ry='5'/%3E%3Ccircle cx='20' cy='20' r='1.4' fill='%23ffffff' fill-opacity='0.55' stroke='none'/%3E%3C/svg%3E");
-  --batik-card: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40' fill='none' stroke='%231f5fd6' stroke-opacity='0.5' stroke-width='1'%3E%3Cellipse cx='20' cy='10' rx='5' ry='10'/%3E%3Cellipse cx='20' cy='30' rx='5' ry='10'/%3E%3Cellipse cx='10' cy='20' rx='10' ry='5'/%3E%3Cellipse cx='30' cy='20' rx='10' ry='5'/%3E%3Ccircle cx='20' cy='20' r='1.4' fill='%231f5fd6' fill-opacity='0.5' stroke='none'/%3E%3C/svg%3E");
+  --batik-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none' stroke='%23ffffff' stroke-width='1'%3E%3Ccircle cx='200' cy='0' r='36' stroke-opacity='0.55'/%3E%3Ccircle cx='200' cy='0' r='60' stroke-opacity='0.45'/%3E%3Ccircle cx='200' cy='0' r='84' stroke-opacity='0.35'/%3E%3Ccircle cx='200' cy='0' r='108' stroke-opacity='0.27'/%3E%3Ccircle cx='200' cy='0' r='132' stroke-opacity='0.2'/%3E%3Ccircle cx='200' cy='0' r='156' stroke-opacity='0.14'/%3E%3C/svg%3E");
+  --batik-card: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none' stroke='%231f5fd6' stroke-width='1'%3E%3Ccircle cx='200' cy='0' r='36' stroke-opacity='0.55'/%3E%3Ccircle cx='200' cy='0' r='60' stroke-opacity='0.45'/%3E%3Ccircle cx='200' cy='0' r='84' stroke-opacity='0.35'/%3E%3Ccircle cx='200' cy='0' r='108' stroke-opacity='0.27'/%3E%3Ccircle cx='200' cy='0' r='132' stroke-opacity='0.2'/%3E%3Ccircle cx='200' cy='0' r='156' stroke-opacity='0.14'/%3E%3C/svg%3E");
 }
 
 body {
@@ -41,7 +42,7 @@ body {
   .card {
     @apply relative isolate rounded-2xl border border-brand-line bg-white;
   }
-  /* Batik corner: pattern fades out from the top-right corner, sits behind the content */
+  /* Batik corner: arcs from the top-right corner, behind the content (opt-in per card) */
   .batik-corner::before {
     content: '';
     position: absolute;
@@ -50,40 +51,39 @@ body {
     pointer-events: none;
     border-radius: inherit;
     background-image: var(--batik-card);
-    background-size: 40px 40px;
-    opacity: 0.55;
-    -webkit-mask-image: radial-gradient(circle at 100% 0%, #000 0%, transparent 75%);
-    mask-image: radial-gradient(circle at 100% 0%, #000 0%, transparent 75%);
+    background-repeat: no-repeat;
+    background-position: top right;
+    background-size: 200px 200px;
+    opacity: 0.8;
     transition: opacity 0.25s ease;
   }
   .batik-corner:hover::before {
-    opacity: 0.85;
+    opacity: 1;
   }
-  /* Hero band ornaments (white lines on the blue band) */
+  /* Hero band ornaments (white arcs on the blue band) */
   .batik-hero {
     position: absolute;
-    width: 22rem;
-    height: 14rem;
+    width: 20rem;
+    height: 20rem;
     pointer-events: none;
     background-image: var(--batik-light);
-    background-size: 40px 40px;
-    opacity: 0.5;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    opacity: 0.7;
   }
   .batik-hero-tr {
     top: 0;
     right: 0;
-    -webkit-mask-image: radial-gradient(circle at 100% 0%, #000 0%, transparent 70%);
-    mask-image: radial-gradient(circle at 100% 0%, #000 0%, transparent 70%);
   }
   .batik-hero-bl {
     bottom: 0;
     left: 0;
-    -webkit-mask-image: radial-gradient(circle at 0% 100%, #000 0%, transparent 70%);
-    mask-image: radial-gradient(circle at 0% 100%, #000 0%, transparent 70%);
+    transform: rotate(180deg);
   }
   @media (max-width: 639px) {
-    .batik-hero { width: 12rem; height: 9rem; }
+    .batik-hero { width: 11rem; height: 11rem; }
   }
+
   .btn {
     @apply inline-flex h-11 items-center justify-center gap-2 rounded-lg px-5 text-sm font-semibold transition-colors;
   }
