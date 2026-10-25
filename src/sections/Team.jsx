@@ -48,7 +48,7 @@ export default function Team() {
             const copy = t(`team.members.${m.key}`);
             return (
               <article key={m.key} className="card flex flex-col overflow-hidden">
-                <div className="h-24 bg-brand-soft sm:h-28" />
+                <div className="batik-banner h-24 bg-brand-soft sm:h-28" aria-hidden="true" />
                 <div className="flex flex-1 flex-col px-5 pb-6 sm:px-7 sm:pb-7">
                   <Avatar member={m} />
                   <h3 className="mt-3 text-2xl font-bold text-ink">{m.name}</h3>
