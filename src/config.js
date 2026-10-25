@@ -5,6 +5,8 @@ export const SITE_URL = 'https://dev.namaiki.xyz';
 export const STUDIO_NAME = 'Namaiki Development';
 export const SUPPORT_URL = 'https://discord.gg/WQjWWbDEKu';
 export const SUPPORT_EMAIL = 'support@namaiki.xyz';
+// Address used by the Notes Wall (fallback email when NOTES_ENDPOINT is empty).
+export const NOTES_EMAIL = 'no-reply@namaiki.xyz';
 export const OWNER_NAME = 'Apriliov';
 export const OWNER_URL = 'https://github.com/apriliov';
 export const COPYRIGHT_YEAR = 2026;
@@ -33,7 +35,7 @@ export const LOCATION_IANA_TZ = 'Asia/Jakarta';
 export const LOCATION_UTC_OFFSET = 7;
 
 // Notes wall. Visitors' notes are sent to this form endpoint (Formspree, Web3Forms, ...).
-// Leave it empty to fall back to opening the visitor's email app addressed to SUPPORT_EMAIL.
+// Leave it empty to fall back to opening the visitor's email app addressed to NOTES_EMAIL.
 export const NOTES_ENDPOINT = '';
 // Only for Web3Forms: your public access key. Leave empty for other services.
 export const NOTES_ACCESS_KEY = '';
