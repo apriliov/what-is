@@ -7,6 +7,8 @@ export const SUPPORT_URL = 'https://discord.gg/WQjWWbDEKu';
 export const SUPPORT_EMAIL = 'support@namaiki.xyz';
 // Address used by the Notes Wall (fallback email when NOTES_ENDPOINT is empty).
 export const NOTES_EMAIL = 'no-reply@namaiki.xyz';
+// Where job applications are sent (Recruitment section).
+export const RECRUIT_EMAIL = 'team@namaiki.xyz';
 export const OWNER_NAME = 'Apriliov';
 export const OWNER_URL = 'https://github.com/apriliov';
 export const COPYRIGHT_YEAR = 2026;

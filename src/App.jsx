@@ -4,6 +4,7 @@ import Hero from './sections/Hero';
 import Marquee from './sections/Marquee';
 import About from './sections/About';
 import Projects from './sections/Projects';
+import Recruitment from './sections/Recruitment';
 import Notes from './sections/Notes';
 import Location from './sections/Location';
 import Faq from './sections/Faq';
@@ -18,6 +19,7 @@ export default function App() {
         <Marquee />
         <About />
         <Projects />
+        <Recruitment />
         <Notes />
         <Location />
         <Faq />
