@@ -106,7 +106,7 @@ function RolePanel({ role }) {
       role="tabpanel"
       aria-labelledby={`role-tab-${role.key}`}
       tabIndex={0}
-      className={`card panel-in p-6 sm:p-8 ${open ? 'batik-corner' : ''}`}
+      className={`card panel-in min-w-0 p-6 sm:p-8 ${open ? 'batik-corner' : ''}`}
     >
       <div className="flex items-start gap-4">
         <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand">
@@ -200,12 +200,12 @@ export default function Recruitment() {
           <h2 className="heading">{t('recruit.rolesTitle')}</h2>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[17rem_minmax(0,1fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[17rem_minmax(0,1fr)]">
           <div
             role="tablist"
             aria-label={t('recruit.rolesTitle')}
             aria-orientation="vertical"
-            className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-2 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0"
+            className="-mx-5 flex min-w-0 gap-2 overflow-x-auto px-5 pb-2 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0"
           >
             {ROLES.map((role, i) => (
               <RoleTab
