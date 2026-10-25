@@ -35,13 +35,13 @@ export default function RecruitStats() {
   return (
     <div className="wrap">
       <div className="relative mx-auto -mt-16 grid max-w-3xl grid-cols-2 gap-3 sm:-mt-20 sm:gap-4">
-        <div className={`flex flex-col items-center justify-center rounded-[2.5rem] bg-brand px-4 py-7 text-center text-white sm:py-9 ${lift}`}>
-          <p className="text-5xl font-extrabold leading-none sm:text-6xl">{TEAM.length}</p>
-          <p className="mt-2 text-xs font-bold uppercase leading-tight tracking-wider text-white/85">{t('recruit.statsTeam')}</p>
+        <div className={`flex flex-col items-center justify-center rounded-[2.5rem] border border-brand-line bg-white px-4 py-7 text-center shadow-lg shadow-ink/10 sm:py-9 ${lift}`}>
+          <p className="text-5xl font-extrabold leading-none text-brand sm:text-6xl">{TEAM.length}</p>
+          <p className="mt-2 text-xs font-bold uppercase leading-tight tracking-wider text-mute">{t('recruit.statsTeam')}</p>
         </div>
-        <div className={`flex flex-col items-center justify-center rounded-[2.5rem_0.75rem_2.5rem_0.75rem] border border-brand-line bg-white px-4 py-7 text-center shadow-sm sm:py-9 ${lift}`}>
-          <p className="text-5xl font-extrabold leading-none text-brand sm:text-6xl">{openRoles}</p>
-          <p className="mt-2 text-xs font-bold uppercase leading-tight tracking-wider text-mute">{t('recruit.statsOpen')}</p>
+        <div className={`flex flex-col items-center justify-center rounded-[2.5rem_0.75rem_2.5rem_0.75rem] bg-ink px-4 py-7 text-center text-white shadow-lg shadow-ink/10 sm:py-9 ${lift}`}>
+          <p className="text-5xl font-extrabold leading-none sm:text-6xl">{openRoles}</p>
+          <p className="mt-2 text-xs font-bold uppercase leading-tight tracking-wider text-white/75">{t('recruit.statsOpen')}</p>
         </div>
         <DateTime />
       </div>
