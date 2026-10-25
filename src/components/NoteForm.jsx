@@ -55,7 +55,7 @@ export default function NoteForm() {
   const bad = status === 'error' || status === 'short';
 
   return (
-    <form onSubmit={onSubmit} className="card mx-auto mt-8 max-w-xl p-6 sm:p-7" noValidate>
+    <form onSubmit={onSubmit} className="card mx-auto mt-14 max-w-xl sm:mt-16 p-6 sm:p-7" noValidate>
       <h3 className="mb-5 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-brand">
         <FiEdit2 size={18} /> {t('notes.formTitle')}
       </h3>
