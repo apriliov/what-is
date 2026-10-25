@@ -2,7 +2,8 @@ import { useLang } from '../i18n.jsx';
 import { NOTES } from '../notes';
 import NoteForm from '../components/NoteForm';
 
-const COLORS = ['bg-blue-100', 'bg-white', 'bg-sky-100', 'bg-indigo-100', 'bg-cyan-100', 'bg-blue-50'];
+// Tone for each note. "white" has no tape, like a plain sheet.
+const TONES = ['sky', 'lilac', 'mint', 'white', 'blue'];
 const MIN_SLOTS = 6;
 
 export default function Notes() {
@@ -18,28 +19,24 @@ export default function Notes() {
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-mute">{t('notes.desc')}</p>
         </div>
 
-        <div className="rounded-3xl border border-brand-line bg-white p-4 sm:p-6">
-          <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
-            {NOTES.map((note, i) => (
-              <li
-                key={`${i}-${note.text.slice(0, 12)}`}
-                className={`relative flex min-h-[9.5rem] flex-col rounded-lg border border-brand-line px-4 pb-3 pt-6 ${COLORS[i % COLORS.length]}`}
-              >
-                <span className="absolute -top-2 left-1/2 h-4 w-14 -translate-x-1/2 rounded-sm bg-brand/15" aria-hidden="true" />
-                <p className="break-words text-base leading-snug text-ink">{note.text}</p>
-                <p className="mt-auto pt-3 text-sm font-medium text-mute">&mdash; {note.name || t('notes.anon')}</p>
-              </li>
-            ))}
-            {Array.from({ length: empty }, (_, i) => (
-              <li
-                key={`empty-${i}`}
-                className="flex min-h-[9.5rem] items-center justify-center rounded-lg border border-dashed border-brand-line bg-brand-soft/50 text-sm text-mute/70"
-                aria-hidden="true"
-              >
-                {t('notes.empty')}
-              </li>
-            ))}
-          </ul>
+        <div className="note-tray">
+          <div className="note-tray-inner">
+            <ul className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:gap-4 md:grid-cols-3">
+              {NOTES.map((note, i) => {
+                const tone = TONES[i % TONES.length];
+                return (
+                  <li key={`${i}-${note.text.slice(0, 12)}`} className={`note note-${tone}`}>
+                    {tone !== 'white' && <span className="note-tape" aria-hidden="true" />}
+                    <p className="note-text">{note.text}</p>
+                    <p className="note-name">&mdash; {note.name || t('notes.anon')}</p>
+                  </li>
+                );
+              })}
+              {Array.from({ length: empty }, (_, i) => (
+                <li key={`empty-${i}`} className="note-empty" aria-hidden="true" />
+              ))}
+            </ul>
+          </div>
         </div>
 
         <NoteForm />
