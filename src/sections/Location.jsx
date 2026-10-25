@@ -2,7 +2,7 @@ import { FiMapPin, FiExternalLink } from 'react-icons/fi';
 import { useLang } from '../i18n.jsx';
 import { useNow, formatWib, formatWibDate } from '../hooks';
 import {
-  LOCATION_CITY, LOCATION_REGION, LOCATION_COUNTRY, LOCATION_TZ,
+  LOCATION_CITY, LOCATION_COUNTRY, LOCATION_TZ,
   LOCATION_UTC_OFFSET, MAPS_URL,
 } from '../config';
 
@@ -19,7 +19,7 @@ export default function Location() {
 
   const facts = [
     { label: t('location.city'), value: LOCATION_CITY },
-    { label: t('location.region'), value: LOCATION_REGION },
+    { label: t('location.region'), value: t('location.regionName') },
     { label: t('location.country'), value: LOCATION_COUNTRY },
     { label: t('location.timezone'), value: LOCATION_TZ },
   ];

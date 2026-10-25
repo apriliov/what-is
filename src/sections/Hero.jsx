@@ -2,7 +2,7 @@ import { FaDiscord } from 'react-icons/fa';
 import { FiArrowRight, FiMapPin } from 'react-icons/fi';
 import { useLang } from '../i18n.jsx';
 import { useNow, formatWib } from '../hooks';
-import { SUPPORT_URL, STUDIO_NAME, LOCATION_CITY, LOCATION_REGION, LOCATION_TZ } from '../config';
+import { SUPPORT_URL, STUDIO_NAME, LOCATION_CITY, LOCATION_TZ } from '../config';
 
 const BOTS = [
   { name: 'Namaiki', logo: '/logo-64.webp' },
@@ -70,7 +70,7 @@ export default function Hero() {
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-brand">
                 <FiMapPin size={15} aria-hidden="true" />
               </span>
-              {LOCATION_CITY}, {LOCATION_REGION}
+              {LOCATION_CITY}, {t('location.regionName')}
             </p>
             <p className="text-4xl font-extrabold text-brand">
               <Clock /> <span className="text-sm font-bold text-mute">{LOCATION_TZ}</span>
