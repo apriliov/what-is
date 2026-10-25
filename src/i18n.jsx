@@ -247,7 +247,7 @@ const id = {
     about: 'Tentang',
     projects: 'Proyek',
     recruitment: 'Rekrutmen',
-    new: 'NEW!',
+    new: 'BARU!',
     notes: 'Catatan',
     location: 'Lokasi',
     faq: 'FAQ',
