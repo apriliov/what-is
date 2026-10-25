@@ -19,7 +19,7 @@ export default function Hero() {
           <div className="h-24 bg-brand-soft sm:h-28" />
           <div className="px-5 pb-6 sm:px-8 sm:pb-8">
             <img
-              src="/logo-256.webp"
+              src="/studio-256.webp"
               alt=""
               width="96"
               height="96"
