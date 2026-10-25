@@ -1,3 +1,4 @@
+import { FaDiscord } from 'react-icons/fa';
 import { useLang } from '../i18n.jsx';
 import LangSwitch from './LangSwitch';
 import { HomeLink, Link } from '../router.jsx';
@@ -53,7 +54,20 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="border-t border-brand-line bg-brand-soft">
+    <footer className="bg-brand-soft">
+      <div className="relative overflow-hidden bg-brand text-white">
+        <span className="batik-hero batik-hero-tr" aria-hidden="true" />
+        <span className="batik-hero batik-hero-bl" aria-hidden="true" />
+        <div className="wrap relative flex flex-col items-center justify-between gap-5 py-10 text-center sm:flex-row sm:text-left">
+          <div>
+            <p className="text-xl font-extrabold sm:text-2xl">{t('footer.ctaTitle')}</p>
+            <p className="mt-1 text-sm text-white/80">{t('footer.ctaDesc')}</p>
+          </div>
+          <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="btn bg-white text-brand hover:bg-brand-soft">
+            <FaDiscord size={16} /> {t('nav.join')}
+          </a>
+        </div>
+      </div>
       <div className="wrap py-12">
         <div className="grid gap-10 md:grid-cols-[1.4fr_2fr]">
           <div>
