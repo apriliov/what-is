@@ -32,6 +32,7 @@ export default function Footer() {
   const pages = [
     { label: t('nav.about'), href: '#about' },
     { label: t('nav.projects'), href: '#projects' },
+    { label: t('nav.notes'), href: '#notes' },
     { label: t('nav.location'), href: '#location' },
     { label: t('nav.faq'), href: '#faq' },
   ];

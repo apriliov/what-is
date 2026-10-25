@@ -5,7 +5,7 @@ import { useLang } from '../i18n.jsx';
 import LangSwitch from './LangSwitch';
 import { SUPPORT_URL, STUDIO_NAME } from '../config';
 
-const LINKS = ['about', 'projects', 'location', 'faq'];
+const LINKS = ['about', 'projects', 'notes', 'location', 'faq'];
 
 export default function Navbar() {
   const { t } = useLang();
