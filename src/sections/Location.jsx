@@ -34,7 +34,7 @@ export default function Location() {
         </div>
 
         <div className="mx-auto grid max-w-3xl gap-4 md:grid-cols-2">
-          <div className="card p-6">
+          <div className="card batik-corner p-6">
             <p className="mb-2 text-sm font-medium text-mute">{t('location.clock')}</p>
             <p className="text-5xl font-extrabold tabular-nums text-brand" aria-label={`${formatWib(now)} WIB`}>
               {formatWib(now, { seconds: true })}

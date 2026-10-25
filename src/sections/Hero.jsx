@@ -21,8 +21,10 @@ export default function Hero() {
   const { t } = useLang();
   return (
     <section id="top">
-      <div className="bg-brand pb-28 pt-14 text-center text-white sm:pb-32 sm:pt-20">
-        <div className="wrap">
+      <div className="relative overflow-hidden bg-brand pb-28 pt-14 text-center text-white sm:pb-32 sm:pt-20">
+        <span className="batik-hero batik-hero-tr" aria-hidden="true" />
+        <span className="batik-hero batik-hero-bl" aria-hidden="true" />
+        <div className="wrap relative">
           <p className="mb-4 text-sm font-bold uppercase tracking-wider text-white/75">{t('hero.label')}</p>
           <h1 className="mx-auto max-w-2xl text-4xl font-extrabold leading-tight sm:text-5xl">{t('hero.title')}</h1>
           <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">{t('hero.subtitle')}</p>

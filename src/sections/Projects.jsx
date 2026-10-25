@@ -24,7 +24,7 @@ export default function Projects() {
           {PROJECTS.map((p) => {
             const copy = t(`projects.${p.key}`);
             return (
-              <article key={p.key} className="card flex flex-col p-6 sm:p-7">
+              <article key={p.key} className="card batik-corner flex flex-col p-6 sm:p-7">
                 <div className="mb-5 flex items-center gap-4">
                   <img src={p.logo} alt="" width="64" height="64" loading="lazy" className="h-16 w-16 rounded-full object-cover" />
                   <div>
