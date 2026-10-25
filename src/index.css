@@ -26,9 +26,44 @@ body {
 
 :focus-visible {
   outline: 2px solid #1f5fd6;
-  outline-offset: 2px;
-  border-radius: 6px;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(31, 95, 214, 0.16);
 }
+/* On the blue bands the blue ring would vanish, so use white there */
+.bg-brand :focus-visible {
+  outline-color: #ffffff;
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.22);
+}
+/* FAQ rows: ring drawn inside the card so it is not clipped */
+summary:focus-visible {
+  outline-offset: -3px;
+  border-radius: 1rem;
+  box-shadow: none;
+}
+
+/* Text selection in brand colors */
+::selection {
+  background: #cfe0fb;
+  color: #0f1a30;
+}
+.bg-brand ::selection {
+  background: rgba(255, 255, 255, 0.92);
+  color: #1a4fb4;
+}
+
+/* Thin, brand-tinted scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #9db8ea #eef4ff;
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #eef4ff; }
+::-webkit-scrollbar-thumb {
+  background: #9db8ea;
+  border-radius: 999px;
+  border: 2px solid #eef4ff;
+}
+::-webkit-scrollbar-thumb:hover { background: #1f5fd6; }
 
 @layer components {
   .wrap {
@@ -261,5 +296,26 @@ body {
   .reveal-ready .reveal.is-visible {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* Marquee: rows fade out at the left and right edges */
+.marquee-fade {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%);
+}
+
+/* FAQ: smooth open/close. Browsers without ::details-content support just open instantly. */
+@media (prefers-reduced-motion: no-preference) {
+  details.card {
+    interpolate-size: allow-keywords;
+  }
+  details.card::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition: block-size 0.3s ease, content-visibility 0.3s allow-discrete;
+  }
+  details.card[open]::details-content {
+    block-size: auto;
   }
 }
