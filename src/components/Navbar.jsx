@@ -5,7 +5,19 @@ import { useLang } from '../i18n.jsx';
 import LangSwitch from './LangSwitch';
 import { SUPPORT_URL, STUDIO_NAME } from '../config';
 
-const LINKS = ['about', 'projects', 'notes', 'location', 'faq'];
+const LINKS = ['about', 'projects', 'recruitment', 'notes', 'location', 'faq'];
+
+function NavLabel({ id }) {
+  const { t } = useLang();
+  return (
+    <>
+      {t(`nav.${id}`)}
+      {id === 'recruitment' && (
+        <sup className="ml-1 text-[10px] font-extrabold tracking-wide text-brand">{t('nav.new')}</sup>
+      )}
+    </>
+  );
+}
 
 export default function Navbar() {
   const { t } = useLang();
@@ -26,10 +38,10 @@ export default function Navbar() {
           <span className="text-base font-bold text-ink">{STUDIO_NAME}</span>
         </a>
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
           {LINKS.map((id) => (
             <a key={id} href={`#${id}`} className="rounded-lg px-3 py-2 text-sm font-medium text-mute hover:text-brand">
-              {t(`nav.${id}`)}
+              <NavLabel id={id} />
             </a>
           ))}
           <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary ml-2 h-10">
@@ -43,14 +55,14 @@ export default function Navbar() {
           aria-label={open ? t('nav.close') : t('nav.menu')}
           aria-expanded={open}
           aria-controls="mobile-menu"
-          className="flex h-11 w-11 items-center justify-center rounded-xl border border-brand-line md:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-xl border border-brand-line lg:hidden"
         >
           {open ? <FiX size={22} /> : <FiMenu size={22} />}
         </button>
       </div>
 
       {open && (
-        <div id="mobile-menu" className="border-t border-brand-line bg-white md:hidden">
+        <div id="mobile-menu" className="border-t border-brand-line bg-white lg:hidden">
           <nav className="wrap flex flex-col py-2" aria-label="Mobile">
             {LINKS.map((id) => (
               <a
@@ -59,7 +71,7 @@ export default function Navbar() {
                 onClick={() => setOpen(false)}
                 className="border-b border-brand-line/70 py-3.5 text-base font-medium text-ink"
               >
-                {t(`nav.${id}`)}
+                <NavLabel id={id} />
               </a>
             ))}
             <div className="flex items-center justify-between gap-3 py-4">
