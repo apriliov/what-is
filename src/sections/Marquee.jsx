@@ -4,7 +4,7 @@ function Row({ items, className, textClass }) {
   // Two identical halves so the loop (translateX -50%) has no gap.
   const half = [...items, ...items];
   return (
-    <div className="overflow-hidden py-3">
+    <div className="marquee-fade overflow-hidden py-3">
       <div className={`flex w-max items-center ${className}`}>
         {[0, 1].map((copy) => (
           <div key={copy} className="flex shrink-0 items-center" aria-hidden={copy === 1}>

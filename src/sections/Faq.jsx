@@ -18,7 +18,7 @@ export default function Faq() {
             <details key={item.q} open={i === 0} className="card group px-5">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-base font-semibold text-ink [&::-webkit-details-marker]:hidden">
                 {item.q}
-                <FiChevronDown size={20} className="shrink-0 text-brand transition-transform group-open:rotate-180" />
+                <FiChevronDown size={20} className="shrink-0 text-brand transition-transform duration-300 group-open:rotate-180 motion-reduce:transition-none" />
               </summary>
               <p className="pb-5 text-base leading-relaxed text-mute">{item.a}</p>
             </details>
