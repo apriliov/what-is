@@ -56,6 +56,7 @@ export default function Hero() {
               alt=""
               width="256"
               height="256"
+              fetchPriority="high"
               className="absolute inset-0 h-full w-full object-cover"
             />
           </div>

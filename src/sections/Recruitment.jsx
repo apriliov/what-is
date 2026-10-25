@@ -1,6 +1,7 @@
 import { FiTerminal, FiCode, FiPenTool, FiShield, FiChevronRight, FiCheck, FiMail } from 'react-icons/fi';
 import { useLang } from '../i18n.jsx';
 import { ROLES } from '../recruitment';
+import CopyEmail from '../components/CopyEmail';
 import { RECRUIT_EMAIL } from '../config';
 
 const ICONS = {
@@ -107,7 +108,13 @@ export default function Recruitment() {
           ))}
         </div>
 
-        {allClosed && <p className="mt-6 text-center text-sm text-mute">{t('recruit.closedNote')}</p>}
+        {allClosed ? (
+          <p className="mt-6 text-center text-sm text-mute">{t('recruit.closedNote')}</p>
+        ) : (
+          <p className="mt-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-center text-sm text-mute">
+            {t('recruit.emailNote')} <CopyEmail email={RECRUIT_EMAIL} />
+          </p>
+        )}
       </div>
     </section>
   );
