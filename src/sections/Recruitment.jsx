@@ -19,7 +19,7 @@ function RoleCard({ role }) {
   const mailto = `mailto:${RECRUIT_EMAIL}?subject=${encodeURIComponent(`${t('recruit.mailSubject')}: ${copy.title}`)}&body=${encodeURIComponent(t('recruit.mailBody'))}`;
 
   return (
-    <article className={`card flex flex-col p-6 sm:p-7 ${open ? '' : 'bg-slate-50'}`}>
+    <article className={`card flex flex-col p-6 sm:p-7 ${open ? 'batik-corner' : 'bg-slate-50'}`}>
       <div className="mb-5 flex flex-wrap items-center gap-2.5">
         <span
           className={`flex h-12 w-12 items-center justify-center rounded-xl border ${
