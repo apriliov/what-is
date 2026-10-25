@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 html {
+  /* Safety net: nothing may widen the page sideways on phones */
+  overflow-x: hidden;
+  overflow-x: clip;
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
   -webkit-text-size-adjust: 100%;
