@@ -48,6 +48,21 @@ body {
   }
 }
 
+/* Marquee strips */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.marquee-left { animation: marquee-left 40s linear infinite; }
+.marquee-right { animation: marquee-right 48s linear infinite; }
+.marquee:hover .marquee-left,
+.marquee:hover .marquee-right { animation-play-state: paused; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .marquee-left, .marquee-right { animation: none; }
 }

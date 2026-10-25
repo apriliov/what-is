@@ -31,3 +31,10 @@ export const PRESIDENT_INVITE_URL =
 export const LOCATION_IANA_TZ = 'Asia/Jakarta';
 // UTC offset in hours for WIB.
 export const LOCATION_UTC_OFFSET = 7;
+
+// Notes wall. Visitors' notes are sent to this form endpoint (Formspree, Web3Forms, ...).
+// Leave it empty to fall back to opening the visitor's email app addressed to SUPPORT_EMAIL.
+export const NOTES_ENDPOINT = '';
+// Only for Web3Forms: your public access key. Leave empty for other services.
+export const NOTES_ACCESS_KEY = '';
+export const NOTES_MAX_LENGTH = 240;
