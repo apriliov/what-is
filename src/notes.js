@@ -6,4 +6,8 @@
 //
 // Example:
 //   { text: 'Botnya keren, ditunggu update berikutnya!', name: 'Rina' },
-export const NOTES = [];
+export const NOTES = [
+  { text: 'Botnya keren, ditunggu update berikutnya!', name: 'Rina' },
+  { text: 'Dashboardnya gampang dipakai, tinggal klik langsung jalan.' },
+  { text: 'Semangat terus dari Majalengka ya!', name: 'Dito' },
+];
