@@ -28,7 +28,7 @@ const en = {
   },
   hero: {
     label: 'Namaiki Development',
-    title: 'Discord bot studio from Majalengka',
+    title: 'Discord bot studio',
     subtitle: 'We make Discord bots and the websites around them. Two bots so far: Namaiki and President.',
   },
   intro: {
@@ -283,7 +283,7 @@ const id = {
   },
   hero: {
     label: 'Namaiki Development',
-    title: 'Studio Bot Discord dari Majalengka',
+    title: 'Studio Bot Discord',
     subtitle: 'Kami bikin bot Discord beserta website pendukungnya. Sejauh ini ada dua bot: Namaiki dan President.',
   },
   intro: {
