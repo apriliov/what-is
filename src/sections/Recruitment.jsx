@@ -68,7 +68,7 @@ function RoleTab({ role, selected, onSelect, onKeyDown }) {
       tabIndex={selected ? 0 : -1}
       onClick={onSelect}
       onKeyDown={onKeyDown}
-      className={`flex min-w-[14rem] shrink-0 items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-colors lg:w-full lg:min-w-0 ${
+      className={`relative flex min-w-[14rem] shrink-0 items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-colors lg:w-full lg:min-w-0 ${
         selected ? 'border-brand bg-brand-soft' : 'border-brand-line bg-white hover:border-brand/50'
       }`}
     >
