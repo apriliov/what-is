@@ -18,6 +18,8 @@
   <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
 
   <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="id_ID" />
   <meta property="og:site_name" content="Namaiki Development" />
   <meta property="og:title" content="Namaiki Development" />
   <meta property="og:description" content="Independent Discord bot studio from Majalengka, Indonesia. Makers of Namaiki and President." />
@@ -30,7 +32,45 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+  <!-- Font stylesheet loads without blocking the first paint -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" /></noscript>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://dev.namaiki.xyz/#organization",
+        "name": "Namaiki Development",
+        "url": "https://dev.namaiki.xyz/",
+        "logo": "https://dev.namaiki.xyz/icon-512.png",
+        "description": "Independent Discord bot studio from Majalengka, Indonesia. Makers of Namaiki and President.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Majalengka",
+          "addressRegion": "West Java",
+          "addressCountry": "ID"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer support",
+          "email": "support@namaiki.xyz"
+        },
+        "sameAs": ["https://discord.gg/WQjWWbDEKu"]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://dev.namaiki.xyz/#website",
+        "url": "https://dev.namaiki.xyz/",
+        "name": "Namaiki Development",
+        "inLanguage": ["en", "id"],
+        "publisher": { "@id": "https://dev.namaiki.xyz/#organization" }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <div id="root"></div>
