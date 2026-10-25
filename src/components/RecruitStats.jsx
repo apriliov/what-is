@@ -1,7 +1,6 @@
 import { FiCalendar, FiClock } from 'react-icons/fi';
 import { useLang } from '../i18n.jsx';
 import { useNow, formatWib, formatWibDate } from '../hooks';
-import { LOCATION_TZ } from '../config';
 import { TEAM } from '../team';
 import { ROLES } from '../recruitment';
 
@@ -10,17 +9,17 @@ function DateTime() {
   const { lang } = useLang();
   const now = useNow(15000);
   return (
-    <div className="col-span-2 flex items-center justify-between gap-4 rounded-3xl border border-brand-line bg-brand-soft p-5 sm:px-7">
+    <div className="col-span-2 flex flex-col gap-3 rounded-3xl border border-brand-line bg-brand-soft p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-7">
       <p className="flex min-w-0 items-center gap-3 text-sm font-semibold text-ink sm:text-base">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-brand">
           <FiCalendar size={16} aria-hidden="true" />
         </span>
         <span className="min-w-0 leading-snug">{formatWibDate(now, lang, { year: true })}</span>
       </p>
-      <p className="flex shrink-0 items-center gap-2 text-3xl font-extrabold text-brand sm:text-4xl">
+      <p className="flex shrink-0 items-baseline gap-2 text-4xl font-extrabold text-brand sm:items-center">
         <FiClock size={20} className="hidden text-mute sm:block" aria-hidden="true" />
         <span className="tabular-nums">{formatWib(now)}</span>
-        <span className="text-xs font-bold text-mute sm:text-sm">{LOCATION_TZ.split(' ')[0]}</span>
+        <span className="text-xs font-bold text-mute sm:text-sm">{lang === 'id' ? 'WIB' : 'UTC+7'}</span>
       </p>
     </div>
   );
@@ -39,9 +38,9 @@ export default function RecruitStats() {
           <p className="text-5xl font-extrabold leading-none text-brand sm:text-6xl">{TEAM.length}</p>
           <p className="mt-2 text-xs font-bold uppercase leading-tight tracking-wider text-mute">{t('recruit.statsTeam')}</p>
         </div>
-        <div className={`flex flex-col items-center justify-center rounded-[2.5rem_0.75rem_2.5rem_0.75rem] bg-ink px-4 py-7 text-center text-white shadow-lg shadow-ink/10 sm:py-9 ${lift}`}>
-          <p className="text-5xl font-extrabold leading-none sm:text-6xl">{openRoles}</p>
-          <p className="mt-2 text-xs font-bold uppercase leading-tight tracking-wider text-white/75">{t('recruit.statsOpen')}</p>
+        <div className={`flex flex-col items-center justify-center rounded-[2.5rem_0.75rem_2.5rem_0.75rem] border border-brand-line bg-white px-4 py-7 text-center shadow-lg shadow-ink/10 sm:py-9 ${lift}`}>
+          <p className="text-5xl font-extrabold leading-none text-brand sm:text-6xl">{openRoles}</p>
+          <p className="mt-2 text-xs font-bold uppercase leading-tight tracking-wider text-mute">{t('recruit.statsOpen')}</p>
         </div>
         <DateTime />
       </div>
