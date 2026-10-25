@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FiEdit2, FiSend } from 'react-icons/fi';
 import { useLang } from '../i18n.jsx';
-import { NOTES_ENDPOINT, NOTES_ACCESS_KEY, NOTES_MAX_LENGTH, SUPPORT_EMAIL } from '../config';
+import { NOTES_ENDPOINT, NOTES_ACCESS_KEY, NOTES_MAX_LENGTH, NOTES_EMAIL } from '../config';
 
 export default function NoteForm() {
   const { t } = useLang();
@@ -26,7 +26,7 @@ export default function NoteForm() {
     if (!NOTES_ENDPOINT) {
       const subject = encodeURIComponent('Catatan untuk dinding Namaiki Development');
       const body = encodeURIComponent(`${text}\n\n- ${from || t('notes.anon')}`);
-      window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:${NOTES_EMAIL}?subject=${subject}&body=${body}`;
       setStatus('mail');
       return;
     }
