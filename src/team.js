@@ -2,7 +2,7 @@
 //
 // image:   file inside public/team/ (webp recommended, square, 256x256 or bigger).
 // discord: link to the Discord profile.
-// github:  link to GitHub, or leave it null to hide the GitHub button.
+// github:  link to GitHub (replace with the person's profile link), or null to hide the button.
 // Role and description texts (EN and ID) live in src/i18n.jsx under `team.members.<key>`.
 export const TEAM = [
   {
@@ -17,14 +17,14 @@ export const TEAM = [
     name: 'Kenzio Zio',
     image: '/team/kenzio.webp',
     discord: 'https://discord.com/users/1555644674931171390',
-    github: null,
+    github: 'https://github.com/',
   },
   {
     key: 'amalia',
     name: 'Amalia',
     image: '/team/amalia.webp',
     discord: 'https://discord.com/users/1482540986004541441',
-    github: null,
+    github: 'https://github.com/',
   },
   {
     key: 'gibran',

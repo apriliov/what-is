@@ -35,6 +35,7 @@ const en = {
     role: 'Indie studio',
     desc: 'A small team from Majalengka, Indonesia. We handle the ideas, code, design, hosting and support ourselves.',
     projects: 'See projects',
+    bots: 'Discord bots',
   },
   about: {
     label: 'About us',
@@ -92,7 +93,6 @@ const en = {
     label: 'Team',
     title: 'Meet the team',
     desc: 'The people behind Namaiki Development, from the bots and websites to the community.',
-    discord: 'Discord profile',
     members: {
       lio: {
         role: 'Owner & Developer',
@@ -290,6 +290,7 @@ const id = {
     role: 'Studio indie',
     desc: 'Tim kecil dari Majalengka, Indonesia. Ide, kode, desain, hosting, sampai support kami kerjakan sendiri.',
     projects: 'Lihat proyek',
+    bots: 'Bot Discord',
   },
   about: {
     label: 'Tentang kami',
@@ -347,7 +348,6 @@ const id = {
     label: 'Tim',
     title: 'Kenalan dengan Tim',
     desc: 'Orang-orang di balik Namaiki Development, dari bot dan website sampai komunitasnya.',
-    discord: 'Profil Discord',
     members: {
       lio: {
         role: 'Owner & Developer',
