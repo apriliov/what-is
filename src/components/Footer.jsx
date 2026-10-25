@@ -1,6 +1,7 @@
 import { useLang } from '../i18n.jsx';
+import LangSwitch from './LangSwitch';
 import {
-  SUPPORT_URL, SUPPORT_EMAIL, STUDIO_NAME,
+  SUPPORT_URL, SUPPORT_EMAIL, STUDIO_NAME, COPYRIGHT_YEAR, OWNER_NAME, OWNER_URL,
   NAMAIKI_URL, NAMAIKI_PRIVACY_URL, NAMAIKI_TERMS_URL, PRESIDENT_URL,
 } from '../config';
 
@@ -46,7 +47,7 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-brand-line bg-brand-soft">
-      <div className="wrap pb-12 pt-12">
+      <div className="wrap py-12">
         <div className="grid gap-10 md:grid-cols-[1.4fr_2fr]">
           <div>
             <a href="#top" className="mb-3 inline-flex items-center gap-3">
@@ -63,6 +64,17 @@ export default function Footer() {
             <Column title={t('footer.bots')} links={bots} />
             <Column title={t('footer.more')} links={more} />
           </div>
+        </div>
+
+        <div className="mt-10 flex flex-col gap-4 border-t border-brand-line pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-mute">
+            &copy; {COPYRIGHT_YEAR}{' '}
+            <a href={OWNER_URL} target="_blank" rel="noopener noreferrer" className="font-medium text-ink hover:text-brand">
+              {OWNER_NAME}
+            </a>
+            . {t('footer.rights')}
+          </p>
+          <LangSwitch />
         </div>
       </div>
     </footer>
