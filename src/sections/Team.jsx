@@ -9,7 +9,7 @@ function initials(name) {
 
 function Avatar({ member }) {
   const [failed, setFailed] = useState(false);
-  const base = '-mt-12 h-24 w-24 rounded-full border-4 border-white';
+  const base = 'relative z-10 -mt-12 h-24 w-24 rounded-full border-4 border-white';
 
   if (failed) {
     return (
