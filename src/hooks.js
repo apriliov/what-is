@@ -43,12 +43,13 @@ export function formatWib(date, { seconds = false } = {}) {
   }).format(date);
 }
 
-export function formatWibDate(date, lang) {
+export function formatWibDate(date, lang, { year = false } = {}) {
   return new Intl.DateTimeFormat(lang === 'id' ? 'id-ID' : 'en-GB', {
     timeZone: LOCATION_IANA_TZ,
     weekday: 'long',
     day: 'numeric',
     month: 'long',
+    ...(year ? { year: 'numeric' } : {}),
   }).format(date);
 }
 

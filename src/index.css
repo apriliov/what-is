@@ -328,3 +328,14 @@ html {
     transition: none !important;
   }
 }
+
+/* Role panel swaps in softly when another role is picked */
+@media (prefers-reduced-motion: no-preference) {
+  .panel-in {
+    animation: panel-in 0.28s ease-out backwards;
+  }
+  @keyframes panel-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+}
