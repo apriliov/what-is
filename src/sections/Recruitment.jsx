@@ -89,12 +89,6 @@ export default function Recruitment() {
   return (
     <section id="recruitment" className="section">
       <div className="wrap">
-        <div className="mb-10 text-center">
-          <p className="label mb-2">{t('recruit.label')}</p>
-          <h2 className="heading">{t('recruit.title')}</h2>
-          <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-mute">{t('recruit.desc')}</p>
-        </div>
-
         <h3 className="mb-5 text-center text-lg font-bold text-ink">{t('recruit.stepsTitle')}</h3>
         <ol className="mb-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {steps.map((step, i) => (
@@ -106,7 +100,7 @@ export default function Recruitment() {
           ))}
         </ol>
 
-        <h3 className="mb-5 text-center text-lg font-bold text-ink">{t('recruit.rolesTitle')}</h3>
+        <h3 id="roles" className="mb-5 text-center text-lg font-bold text-ink">{t('recruit.rolesTitle')}</h3>
         <div className="grid gap-5 md:grid-cols-2">
           {ROLES.map((role) => (
             <RoleCard key={role.key} role={role} />
