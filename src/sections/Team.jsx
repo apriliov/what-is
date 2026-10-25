@@ -56,7 +56,7 @@ export default function Team() {
                   <p className="mt-3 text-base leading-relaxed text-mute">{copy.desc}</p>
                   <div className={`mt-auto grid gap-3 pt-5 ${m.github ? 'grid-cols-2' : 'grid-cols-1'}`}>
                     <a href={m.discord} target="_blank" rel="noopener noreferrer" className="btn btn-outline">
-                      <FaDiscord size={16} /> {t('team.discord')}
+                      <FaDiscord size={16} /> Discord
                     </a>
                     {m.github && (
                       <a href={m.github} target="_blank" rel="noopener noreferrer" className="btn btn-outline">
