@@ -15,7 +15,7 @@ export const COPYRIGHT_YEAR = 2026;
 
 // Location
 export const LOCATION_CITY = 'Majalengka';
-export const LOCATION_REGION = 'West Java';
+// Display name of the province lives in i18n (location.regionName): West Java / Jawa Barat.
 export const LOCATION_COUNTRY = 'Indonesia';
 export const LOCATION_TZ = 'WIB (UTC+7)';
 export const MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=Majalengka%2C+West+Java%2C+Indonesia';
