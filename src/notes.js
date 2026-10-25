@@ -13,5 +13,5 @@ export const NOTES = [
   { text: 'Namaiki 대시보드가 정말 쓰기 편해요. 앞으로 업데이트도 기대할게요!', name: '민준' },
   { text: 'Semoga makin banyak fitur baru.' },
   { text: 'President is so much fun. The elections keep our whole server busy.' },
-  { text: 'President 봇 덕분에 서버가 훨씬 활기차졌어요. 선거 기능 최고예요!', name: '서연' },
+  { text: 'President बॉट की वजह से हमारा सर्वर बहुत एक्टिव हो गया है। चुनाव फीचर शानदार है!', name: 'प्रिया' },
 ];
