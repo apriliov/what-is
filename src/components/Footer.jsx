@@ -1,6 +1,7 @@
 import { FaDiscord } from 'react-icons/fa';
 import { useLang } from '../i18n.jsx';
 import LangSwitch from './LangSwitch';
+import CopyEmail from './CopyEmail';
 import { HomeLink, Link } from '../router.jsx';
 import {
   SUPPORT_URL, SUPPORT_EMAIL, STUDIO_NAME, COPYRIGHT_YEAR, OWNER_NAME, OWNER_URL,
@@ -76,9 +77,7 @@ export default function Footer() {
               <span className="text-base font-bold text-ink">{STUDIO_NAME}</span>
             </HomeLink>
             <p className="mb-3 max-w-xs text-sm text-mute">{t('footer.about')}</p>
-            <a href={`mailto:${SUPPORT_EMAIL}`} className="text-sm font-medium text-brand hover:underline">
-              {SUPPORT_EMAIL}
-            </a>
+            <CopyEmail email={SUPPORT_EMAIL} />
           </div>
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
             <Column title={t('footer.pages')} links={pages} />
