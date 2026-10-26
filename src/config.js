@@ -18,6 +18,9 @@ export const LOCATION_CITY = 'Majalengka';
 // Display name of the province lives in i18n (location.regionName): West Java / Jawa Barat.
 export const LOCATION_COUNTRY = 'Indonesia';
 export const LOCATION_TZ = 'WIB (UTC+7)';
+// Coordinates of Majalengka city centre, used for the weather card.
+export const LOCATION_LAT = -6.8364;
+export const LOCATION_LON = 108.2274;
 export const MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=Majalengka%2C+West+Java%2C+Indonesia';
 
 // Projects
