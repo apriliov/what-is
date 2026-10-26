@@ -114,18 +114,18 @@ export default function Navbar() {
       }`}
     >
       <div className="wrap flex h-16 items-center justify-between gap-4">
-        <HomeLink hash="top" className="flex items-center gap-3" onClick={close}>
+        <HomeLink hash="top" className="flex shrink-0 items-center gap-3" onClick={close}>
           <img src="/studio-64.webp" alt="" width="40" height="40" className="h-10 w-10 rounded-lg object-cover" />
-          <span className="text-base font-bold text-ink">{STUDIO_NAME}</span>
+          <span className="whitespace-nowrap text-base font-bold text-ink lg:text-sm xl:text-base">{STUDIO_NAME}</span>
         </HomeLink>
 
-        <nav ref={navRef} className="relative hidden items-center gap-1 self-stretch lg:flex" aria-label="Main">
+        <nav ref={navRef} className="relative hidden items-center gap-0.5 self-stretch lg:flex xl:gap-1" aria-label={t('nav.label')}>
           {LINKS.map((link) => (
             <NavItem
               key={link.id}
               link={link}
               activeId={activeId}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-mute hover:text-brand"
+              className="whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium text-mute hover:text-brand xl:px-3"
             />
           ))}
           <span
@@ -133,7 +133,7 @@ export default function Navbar() {
             className="pointer-events-none absolute bottom-0 left-0 h-0.5 rounded-full bg-brand transition-[transform,width,opacity] duration-300 ease-out motion-reduce:transition-none"
             style={{ width: bar.width, transform: `translateX(${bar.left}px)`, opacity: bar.show ? 1 : 0 }}
           />
-          <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary ml-2 h-10">
+          <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary ml-1 h-10 whitespace-nowrap xl:ml-2">
             <FaDiscord size={16} /> {t('nav.join')}
           </a>
         </nav>
@@ -159,7 +159,7 @@ export default function Navbar() {
           id="mobile-menu"
           className="absolute inset-x-0 top-full max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-t border-brand-line bg-white shadow-[0_18px_30px_-20px_rgba(15,26,48,0.45)] lg:hidden"
         >
-          <nav className="wrap flex flex-col py-2" aria-label="Mobile">
+          <nav className="wrap flex flex-col py-2" aria-label={t('nav.label')}>
             {LINKS.map((link) => (
               <NavItem
                 key={link.id}
