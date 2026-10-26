@@ -1,5 +1,6 @@
 import { FiMapPin, FiExternalLink } from 'react-icons/fi';
 import { useLang } from '../i18n.jsx';
+import WeatherCard from '../components/WeatherCard';
 import { useNow, formatWib, formatWibDate } from '../hooks';
 import {
   LOCATION_CITY, LOCATION_COUNTRY, LOCATION_TZ,
@@ -56,6 +57,8 @@ export default function Location() {
               <FiMapPin size={15} /> {t('location.map')} <FiExternalLink size={13} />
             </a>
           </div>
+
+          <WeatherCard />
         </div>
       </div>
     </section>
