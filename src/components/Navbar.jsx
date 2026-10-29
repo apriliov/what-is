@@ -4,6 +4,7 @@ import { FiMenu, FiX } from 'react-icons/fi';
 import { useLang } from '../i18n.jsx';
 import { HomeLink, Link, usePath } from '../router.jsx';
 import LangSwitch from './LangSwitch';
+import AccountMenu from './AccountMenu';
 import { useScrollSpy } from '../hooks';
 import { SUPPORT_URL, STUDIO_NAME } from '../config';
 
@@ -12,13 +13,14 @@ const LINKS = [
   { id: 'about' },
   { id: 'projects' },
   { id: 'recruitment', to: '/recruitment', isNew: true },
+  { id: 'giveaway' },
   { id: 'notes' },
   { id: 'location' },
   { id: 'faq' },
 ];
 
 // Sections the scroll spy follows (module level so the array stays the same between renders).
-const SPY_IDS = ['about', 'projects', 'notes', 'location', 'faq', 'team'];
+const SPY_IDS = ['about', 'projects', 'giveaway', 'notes', 'location', 'faq', 'team'];
 
 function NavItem({ link, className, onNavigate, activeId }) {
   const { t } = useLang();
@@ -133,6 +135,7 @@ export default function Navbar() {
             className="pointer-events-none absolute bottom-0 left-0 h-0.5 rounded-full bg-brand transition-[transform,width,opacity] duration-300 ease-out motion-reduce:transition-none"
             style={{ width: bar.width, transform: `translateX(${bar.left}px)`, opacity: bar.show ? 1 : 0 }}
           />
+          <AccountMenu />
           <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary ml-1 h-10 whitespace-nowrap xl:ml-2">
             <FaDiscord size={16} /> {t('nav.join')}
           </a>
@@ -169,6 +172,7 @@ export default function Navbar() {
                 className="border-b border-brand-line/70 py-3.5 text-base font-medium text-ink"
               />
             ))}
+            <AccountMenu inline onNavigate={close} />
             <div className="flex items-center justify-between gap-3 py-4">
               <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
                 <FaDiscord size={16} /> {t('nav.join')}
