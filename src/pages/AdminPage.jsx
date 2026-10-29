@@ -1,12 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
 import { FaDiscord } from 'react-icons/fa';
 import { FiAward, FiBell, FiGift, FiTrash2 } from 'react-icons/fi';
+import { Winners } from '../sections/Giveaway';
 import { api, formatDateTime } from '../api';
 import { useAuth } from '../auth.jsx';
 import { useLang } from '../i18n.jsx';
 import { Link } from '../router.jsx';
 
 const MAX_TEXT = 600;
+const defaultEnd = () => {
+  const d = new Date(Date.now() + 86400000);
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
+};
 const field = 'w-full rounded-xl border border-brand-line bg-brand-soft/60 px-4 text-base text-ink placeholder:text-mute/70 focus:border-brand focus:outline-none';
 
 function Announcements() {
@@ -78,7 +84,7 @@ function Announcements() {
 function Giveaways() {
   const { t, lang } = useLang();
   const [items, setItems] = useState([]);
-  const [form, setForm] = useState({ title: '', prize: '', winnersCount: 1 });
+  const [form, setForm] = useState({ title: '', prize: '', winnersCount: 1, endsAt: defaultEnd() });
   const [msg, setMsg] = useState({ bad: false, text: '' });
   const [busy, setBusy] = useState('');
 
@@ -102,7 +108,10 @@ function Giveaways() {
 
   const create = async (e) => {
     e.preventDefault();
-    if (await act('create', form, t('admin.gaCreated'))) setForm({ title: '', prize: '', winnersCount: 1 });
+    const endsAt = new Date(form.endsAt).getTime();
+    if (await act('create', { ...form, endsAt }, t('admin.gaCreated'))) {
+      setForm({ title: '', prize: '', winnersCount: 1, endsAt: defaultEnd() });
+    }
   };
 
   const draw = (g) => {
@@ -130,7 +139,11 @@ function Giveaways() {
           <input id="ga-win" type="number" min={1} max={20} value={form.winnersCount} onChange={(e) => setForm({ ...form, winnersCount: e.target.value })} className={`${field} h-12`} />
         </div>
         <div className="sm:col-span-3">
-          <button type="submit" disabled={busy === 'create' || !form.title.trim() || !form.prize.trim()} className="btn btn-primary disabled:opacity-60">{t('admin.gaCreate')}</button>
+          <label htmlFor="ga-end" className="mb-2 block text-sm font-semibold text-ink">{t('admin.gaEnds')}</label>
+          <input id="ga-end" type="datetime-local" value={form.endsAt} onChange={(e) => setForm({ ...form, endsAt: e.target.value })} className={`${field} h-12 sm:w-auto`} />
+        </div>
+        <div className="sm:col-span-3">
+          <button type="submit" disabled={busy === 'create' || !form.title.trim() || !form.prize.trim() || !form.endsAt} className="btn btn-primary disabled:opacity-60">{t('admin.gaCreate')}</button>
           <p className={`mt-3 text-sm ${msg.bad ? 'text-red-600' : 'text-mute'}`} role="status">{msg.text}</p>
         </div>
       </form>
@@ -143,24 +156,14 @@ function Giveaways() {
               <div className="min-w-0">
                 <p className="break-words font-bold text-ink">{g.title}</p>
                 <p className="break-words text-sm text-mute">{g.prize} &middot; {g.entries} {t('giveaway.entries')} &middot; {g.winnersCount} {t('giveaway.winnersCount')}</p>
-                <p className="text-xs text-mute">{formatDateTime(g.createdAt, lang)}</p>
+                <p className="text-xs text-mute">{t('admin.gaEndsAt')}: {g.endsAt ? formatDateTime(g.endsAt, lang) : '-'}</p>
               </div>
               <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${g.status === 'open' ? 'bg-brand text-white' : 'bg-brand-soft text-mute'}`}>
                 {g.status === 'open' ? t('giveaway.open') : t('giveaway.ended')}
               </span>
             </div>
 
-            {g.status === 'ended' && (
-              <ul className="mt-3 flex flex-col gap-1.5">
-                {g.winners.map((w) => (
-                  <li key={w.id} className="flex items-center gap-2 text-sm text-ink">
-                    <img src={w.avatar} alt="" width="24" height="24" className="h-6 w-6 rounded-full" />
-                    <span className="font-semibold">{w.name}</span>
-                    <code className="text-xs text-mute">{w.id}</code>
-                  </li>
-                ))}
-              </ul>
-            )}
+            {g.status === 'ended' && <Winners winners={g.winners} isAdmin />}
 
             <div className="mt-3 flex gap-2">
               {g.status === 'open' && (
