@@ -6,11 +6,15 @@ import Marquee from './sections/Marquee';
 import About from './sections/About';
 import Projects from './sections/Projects';
 import Notes from './sections/Notes';
+import Giveaway from './sections/Giveaway';
 import Location from './sections/Location';
 import Faq from './sections/Faq';
 import Team from './sections/Team';
 import RecruitmentPage from './pages/RecruitmentPage';
 import NotFoundPage from './pages/NotFoundPage';
+import AdminPage from './pages/AdminPage';
+import AnnouncementPopup from './components/AnnouncementPopup';
+import LoginNotice from './components/LoginNotice';
 import { usePath, jumpTo, isKnownPath } from './router.jsx';
 import { useReveal } from './hooks';
 import { STUDIO_NAME } from './config';
@@ -33,12 +37,15 @@ export default function App() {
           <NotFoundPage />
         ) : path === '/recruitment' ? (
           <RecruitmentPage />
+        ) : path === '/admin' ? (
+          <AdminPage />
         ) : (
           <>
             <Hero />
             <Marquee />
             <About />
             <Projects />
+            <Giveaway />
             <Notes />
             <Location />
             <Faq />
@@ -47,6 +54,8 @@ export default function App() {
         )}
       </main>
       <Footer />
+      {path === '/' && <AnnouncementPopup />}
+      <LoginNotice />
     </div>
   );
 }

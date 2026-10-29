@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-// Tiny client-side router (no extra dependency). Pages: "/" and "/recruitment".
+// Tiny client-side router (no extra dependency). Pages: "/", "/recruitment" and "/admin".
 const EVENT = 'nd-navigate';
 
 const clean = (p) => p.replace(/\/+$/, '') || '/';
@@ -10,7 +10,7 @@ const currentPath = () => {
   return p === '/index.html' ? '/' : p;
 };
 
-export const KNOWN_PATHS = ['/', '/recruitment'];
+export const KNOWN_PATHS = ['/', '/recruitment', '/admin'];
 export const isKnownPath = (p) => KNOWN_PATHS.includes(p);
 
 export function navigate(to) {
