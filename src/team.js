@@ -7,20 +7,20 @@
 export const TEAM = [
   {
     key: 'lio',
-    name: 'Akbar Aprilio',
+    name: '@apriliov',
     image: '/lio.webp',
     discord: 'https://discord.com/users/995913592253710356',
     github: 'https://github.com/apriliov',
   },
   {
-    key: 'kenzio',
+    key: '@kenzi.o',
     name: 'Kenzio Zio',
     image: '/kenzio.webp',
     discord: 'https://discord.com/users/1555644674931171390',
     github: 'https://github.com/',
   },
   {
-    key: 'amalia',
+    key: '@amaliaeline',
     name: 'Amalia',
     image: '/amalia.webp',
     discord: 'https://discord.com/users/1482540986004541441',
@@ -28,7 +28,7 @@ export const TEAM = [
   },
   {
     key: 'gibran',
-    name: 'Gibran',
+    name: '@gebrann',
     image: '/gibran.webp',
     discord: 'https://discord.com/users/987243096217628703',
     github: 'https://github.com/gebrann',
