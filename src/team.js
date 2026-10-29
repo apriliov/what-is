@@ -14,7 +14,7 @@ export const TEAM = [
     github: 'https://github.com/',
   },
   {
-    key: 'amelia',
+    key: 'amalia',
     name: '@amaliaeline',
     image: '/amalia.webp',
     discord: 'https://discord.com/users/1482540986004541441',
