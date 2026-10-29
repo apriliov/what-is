@@ -1,17 +1,80 @@
 import { useCallback, useEffect, useState } from 'react';
 import { FaDiscord } from 'react-icons/fa';
-import { FiAward, FiCheck, FiGift, FiUsers } from 'react-icons/fi';
+import { FiAward, FiCheck, FiClock, FiGift, FiMessageCircle } from 'react-icons/fi';
 import { api } from '../api';
 import { useAuth } from '../auth.jsx';
 import { useLang } from '../i18n.jsx';
 
-function Winners({ winners }) {
+// "2d 03:14:09" (days only when there are any). Same in every language.
+export function formatLeft(ms) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const d = Math.floor(total / 86400);
+  const h = String(Math.floor((total % 86400) / 3600)).padStart(2, '0');
+  const m = String(Math.floor((total % 3600) / 60)).padStart(2, '0');
+  const s = String(total % 60).padStart(2, '0');
+  return `${d ? `${d}d ` : ''}${h}:${m}:${s}`;
+}
+
+function useNowTick(active) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!active) return undefined;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [active]);
+  return now;
+}
+
+// Up to 3 newest entrants as half-overlapping avatars, then the total.
+export function Participants({ recent, total }) {
+  const { t } = useLang();
+  const shown = (recent || []).slice(0, 3);
   return (
-    <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+    <div className="flex items-center gap-3">
+      {shown.length > 0 && (
+        <div className="flex" aria-hidden="true">
+          {shown.map((p, i) => (
+            <img
+              key={`${p.name}-${i}`}
+              src={p.avatar}
+              alt=""
+              title={p.name}
+              width="32"
+              height="32"
+              className={`h-8 w-8 rounded-full bg-brand-soft ring-2 ring-white ${i > 0 ? '-ml-4' : ''}`}
+              style={{ zIndex: shown.length - i }}
+            />
+          ))}
+        </div>
+      )}
+      <span className="text-sm text-mute">
+        {total > 0 ? <><b className="text-ink">{total}</b> {t('giveaway.entries')}</> : t('giveaway.noEntries')}
+      </span>
+    </div>
+  );
+}
+
+export function Winners({ winners, isAdmin }) {
+  const { t } = useLang();
+  if (!winners.length) return <p className="mt-3 text-sm text-mute">{t('giveaway.noWinners')}</p>;
+  return (
+    <ul className="mt-4 grid gap-3 sm:grid-cols-2">
       {winners.map((w, i) => (
-        <li key={`${w.name}-${i}`} className="flex items-center gap-3 rounded-xl border border-brand-line bg-brand-soft px-3 py-2">
-          <img src={w.avatar} alt="" width="36" height="36" className="h-9 w-9 rounded-full bg-white" />
-          <span className="truncate text-sm font-semibold text-ink">{w.name}</span>
+        <li key={`${w.name}-${i}`} className="flex flex-col gap-2 rounded-xl border border-brand-line bg-brand-soft p-3">
+          <div className="flex items-center gap-3">
+            <img src={w.avatar} alt="" width="40" height="40" className="h-10 w-10 rounded-full bg-white" />
+            <span className="truncate text-sm font-semibold text-ink">{w.name}</span>
+          </div>
+          {isAdmin && w.id && (
+            <a
+              href={`https://discord.com/users/${w.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline h-9 bg-white text-xs"
+            >
+              <FiMessageCircle size={14} /> {t('giveaway.dm')}
+            </a>
+          )}
         </li>
       ))}
     </ul>
@@ -20,8 +83,11 @@ function Winners({ winners }) {
 
 function GiveawayCard({ g, onJoin, busy, revealed, onReveal }) {
   const { t } = useLang();
-  const { loginReady, user, login } = useAuth();
+  const { loginReady, user, isAdmin, login } = useAuth();
   const open = g.status === 'open';
+  const now = useNowTick(open && Boolean(g.endsAt));
+  const left = g.endsAt ? g.endsAt - now : null;
+  const timeUp = open && left !== null && left <= 0;
 
   return (
     <li className="card p-5 sm:p-6">
@@ -38,12 +104,21 @@ function GiveawayCard({ g, onJoin, busy, revealed, onReveal }) {
         </span>
       </div>
 
-      <p className="mt-3 flex items-center gap-2 text-sm text-mute">
-        <FiUsers size={16} className="shrink-0" /> {g.entries} {t('giveaway.entries')}
-        <span aria-hidden="true">&middot;</span> {g.winnersCount} {t('giveaway.winnersCount')}
-      </p>
+      {open && left !== null && (
+        <p className="mt-4 flex items-center gap-2 rounded-xl bg-brand-soft px-4 py-3 text-sm text-ink" role="timer">
+          <FiClock size={16} className="shrink-0 text-brand" />
+          {timeUp ? t('giveaway.timeUp') : (
+            <>{t('giveaway.endsIn')} <b className="font-mono tabular-nums text-brand">{formatLeft(left)}</b></>
+          )}
+        </p>
+      )}
 
-      {open && (
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <Participants recent={g.recent} total={g.entries} />
+        <span className="text-sm text-mute">{g.winnersCount} {t('giveaway.winnersCount')}</span>
+      </div>
+
+      {open && !timeUp && (
         <div className="mt-4">
           {user ? (
             <button
@@ -69,7 +144,7 @@ function GiveawayCard({ g, onJoin, busy, revealed, onReveal }) {
               <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-brand">
                 <FiAward size={16} /> {t('giveaway.winners')}
               </p>
-              <Winners winners={g.winners} />
+              <Winners winners={g.winners} isAdmin={isAdmin} />
             </>
           ) : (
             <button type="button" onClick={onReveal} className="btn btn-primary w-full sm:w-auto">
@@ -101,6 +176,16 @@ export default function Giveaway() {
 
   // Reload when the visitor logs in or out, so "joined" is correct.
   useEffect(() => { load(); }, [load, user?.id]);
+
+  // When a timer runs out, reload: the server draws the winners the first time it is asked after the end time.
+  useEffect(() => {
+    if (!items) return undefined;
+    const ends = items.filter((g) => g.status === 'open' && g.endsAt).map((g) => g.endsAt);
+    if (!ends.length) return undefined;
+    const delay = Math.min(Math.max(Math.min(...ends) - Date.now() + 1000, 1500), 1e9);
+    const id = setTimeout(load, delay);
+    return () => clearTimeout(id);
+  }, [items, load]);
 
   const join = async (id) => {
     setBusy(id);
