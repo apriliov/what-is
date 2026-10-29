@@ -1,9 +1,3 @@
-// People shown in the "Meet the team" section (bottom of the home page).
-//
-// image:   file inside public/team/ (webp recommended, square, 256x256 or bigger).
-// discord: link to the Discord profile.
-// github:  link to GitHub (replace with the person's profile link), or null to hide the button.
-// Role and description texts (EN and ID) live in src/i18n.jsx under `team.members.<key>`.
 export const TEAM = [
   {
     key: 'lio',
