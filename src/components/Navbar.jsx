@@ -5,25 +5,14 @@ import { useLang } from '../i18n.jsx';
 import { HomeLink, Link, usePath, isChatPath } from '../router.jsx';
 import LangSwitch from './LangSwitch';
 import AccountMenu from './AccountMenu';
-import { useScrollSpy } from '../hooks';
 import { SUPPORT_URL, STUDIO_NAME } from '../config';
 
 // `to` = separate page, otherwise a section of the home page.
 const LINKS = [
-  { id: 'about' },
-  { id: 'projects' },
+  { id: 'home', hash: 'top' },
+  { id: 'chat', to: '/chat' },
   { id: 'recruitment', to: '/recruitment', isNew: true },
-  // Desktop nav is already full at 1024px (Indonesian labels are long), so Chat joins it from 1280px up.
-  // Below that it is in the mobile menu and the footer.
-  { id: 'chat', to: '/chat', xlOnly: true },
-  { id: 'giveaway' },
-  { id: 'notes' },
-  { id: 'location' },
-  { id: 'faq' },
 ];
-
-// Sections the scroll spy follows (module level so the array stays the same between renders).
-const SPY_IDS = ['about', 'projects', 'giveaway', 'notes', 'location', 'faq', 'team'];
 
 function NavItem({ link, className, onNavigate, activeId }) {
   const { t } = useLang();
@@ -51,7 +40,7 @@ function NavItem({ link, className, onNavigate, activeId }) {
   }
   return (
     <HomeLink
-      hash={link.id}
+      hash={link.hash || link.id}
       onClick={onNavigate}
       data-nav={link.id}
       aria-current={activeId === link.id ? 'location' : undefined}
@@ -68,24 +57,19 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
 
-  // Shadow once the page is scrolled; the scroll spy only counts after the hero.
+  // Shadow once the page is scrolled.
   const [scrolled, setScrolled] = useState(false);
-  const [pastHero, setPastHero] = useState(false);
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 8);
-      setPastHero(window.scrollY > 240);
-    };
+    const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const spy = useScrollSpy(SPY_IDS, path);
   let activeId = '';
-  if (path === '/recruitment') activeId = 'recruitment';
+  if (path === '/') activeId = 'home';
+  else if (path === '/recruitment') activeId = 'recruitment';
   else if (isChatPath(path)) activeId = 'chat';
-  else if (pastHero) activeId = spy;
 
   // Sliding underline under the active menu item (desktop).
   const navRef = useRef(null);
@@ -131,9 +115,7 @@ export default function Navbar() {
               key={link.id}
               link={link}
               activeId={activeId}
-              className={`whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium text-mute hover:text-brand xl:px-3 ${
-                link.xlOnly ? 'hidden xl:block' : ''
-              }`}
+              className="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-mute hover:text-brand xl:px-4"
             />
           ))}
           <span

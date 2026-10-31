@@ -37,14 +37,9 @@ export default function Footer() {
   const { t } = useLang();
 
   const pages = [
-    { label: t('nav.about'), hash: 'about' },
-    { label: t('nav.projects'), hash: 'projects' },
-    { label: t('nav.recruitment'), to: '/recruitment' },
+    { label: t('nav.home'), hash: 'top' },
     { label: t('nav.chat'), to: '/chat' },
-    { label: t('nav.giveaway'), hash: 'giveaway' },
-    { label: t('nav.notes'), hash: 'notes' },
-    { label: t('nav.location'), hash: 'location' },
-    { label: t('nav.faq'), hash: 'faq' },
+    { label: t('nav.recruitment'), to: '/recruitment' },
   ];
   const bots = [
     { label: 'Namaiki', href: NAMAIKI_URL, external: true },
