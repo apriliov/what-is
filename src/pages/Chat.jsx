@@ -528,7 +528,7 @@ function Lobby({ T }) {
           {L.features.map((f, i) => {
             const Icon = icons[i];
             return (
-              <div key={f.title} className="card px-6 py-7 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-28px_rgba(15,26,48,0.5)]">
+              <div key={f.title} className="card card-lift px-6 py-7">
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-soft text-brand">
                   <Icon size={22} aria-hidden="true" />
                 </span>
