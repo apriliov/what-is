@@ -342,3 +342,25 @@ html {
     to { opacity: 1; transform: none; }
   }
 }
+
+
+/* Cards that rise a little on hover. One effect for every card on the site (Home, Recruitment, Chat). */
+.card-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .card-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px -28px rgba(15, 26, 48, 0.5);
+  }
+}
+/* The scroll reveal sets its own transform and transition. Once a card is shown, hand both over to the hover effect. */
+.reveal-ready .reveal.is-visible.card-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition-delay: 0s;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .reveal-ready .reveal.is-visible.card-lift:hover {
+    transform: translateY(-2px);
+  }
+}
