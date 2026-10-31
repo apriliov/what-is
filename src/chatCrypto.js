@@ -66,7 +66,38 @@ export async function decryptBytes(key, aad, ivB64, ctB64) {
 }
 
 // Passwords live only in memory (a refresh forgets them) and are never put in the URL.
+// The one thing kept for the current tab is a "this room has no password" marker (sessionStorage),
+// so refreshing a room without a password does not ask for one. Real passwords are never stored.
 const secrets = new Map();
-export const setRoomSecret = (room, password) => secrets.set(room, String(password));
-export const getRoomSecret = (room) => (secrets.has(room) ? secrets.get(room) : null);
+const NOPW_KEY = (room) => `chat:nopw:${room}`;
+const markNoPw = (room, on) => {
+  try {
+    if (on) sessionStorage.setItem(NOPW_KEY(room), '1');
+    else sessionStorage.removeItem(NOPW_KEY(room));
+  } catch {
+    // storage blocked: a refresh will just ask again
+  }
+};
+const hasNoPwMark = (room) => {
+  try {
+    return sessionStorage.getItem(NOPW_KEY(room)) === '1';
+  } catch {
+    return false;
+  }
+};
+export const setRoomSecret = (room, password) => {
+  const pw = String(password);
+  secrets.set(room, pw);
+  markNoPw(room, pw === '');
+};
+export const getRoomSecret = (room) => {
+  if (secrets.has(room)) return secrets.get(room);
+  return hasNoPwMark(room) ? '' : null;
+};
+// Called when leaving the page: forgets the password but keeps the no-password marker for refreshes.
 export const clearRoomSecret = (room) => secrets.delete(room);
+// Called when the user wants to enter a different password: forgets everything about this room.
+export const forgetRoomSecret = (room) => {
+  secrets.delete(room);
+  markNoPw(room, false);
+};
