@@ -24,7 +24,7 @@ const MAX_LEN = 250; // characters per message
 
 // Ad banner: after every AD_EVERY chat bubbles, one labelled ad card is added to the conversation.
 // It only exists on this screen (never sent through the channel, never stored). Put the image in public/.
-const AD_EVERY = 10;
+const AD_EVERY = 5;
 const AD_SRC = '/ads.webp';
 const AD_URL = ''; // optional: where a tap on the banner goes, e.g. 'https://example.com'. Empty = not clickable
 const MAX_BUBBLES = 50; // bubbles kept on screen
@@ -1169,7 +1169,12 @@ function Room({ room, T, lang }) {
   };
 
   const reveal = (id) => setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, shown: true } : m)));
-  const dropAd = (id) => setMessages((prev) => prev.filter((m) => m.id !== id)); // image missing: no empty card
+  const dropAd = (id) => {
+    // image missing: remove the card instead of showing a broken box, and say why in the console
+    // eslint-disable-next-line no-console
+    console.warn(`[chat] Ad image not found: ${AD_SRC}. Put the file in the public/ folder.`);
+    setMessages((prev) => prev.filter((m) => m.id !== id));
+  };
   const dropPhoto = (id) => setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, src: null } : m)));
 
   const toggleBlock = () => {
