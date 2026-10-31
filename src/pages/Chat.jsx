@@ -370,11 +370,29 @@ const COL = 'w-full px-4 sm:px-6';
 
 /* ------------------------------ Lobby ------------------------------ */
 
+// Chat bubbles pop in one after another, stay for a moment, fade out together and start over.
+const BUBBLE_STARTS = [4, 14, 26, 38, 50, 62]; // % of the loop when each bubble appears (conversation order)
+const BUBBLE_CSS = `
+${BUBBLE_STARTS.map(
+  (st, i) => `@keyframes nmb${i}{0%,${st}%{opacity:0;transform:translateY(8px) scale(.82)}${st + 5}%{opacity:1;transform:none}88%{opacity:1;transform:none}96%,100%{opacity:0;transform:translateY(-4px) scale(.96)}}
+.nm-b${i}{animation:nmb${i} 9s ease-out infinite}`
+).join('\n')}
+.nm-b{transform-box:fill-box;transform-origin:center;opacity:0}
+@keyframes nmdash{to{stroke-dashoffset:-18}}
+.nm-dash{animation:nmdash 1.2s linear infinite}
+@keyframes nmbolt{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.nm-bolt{transform-box:fill-box;transform-origin:center;animation:nmbolt 1.8s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){
+  .nm-b{animation:none!important;opacity:1}
+  .nm-dash,.nm-bolt{animation:none}
+}`;
+
 function Illustration({ label }) {
   // Original illustration. To use your own artwork instead, replace this component with
   // <img src="/chat-hero.webp" alt={label} className="mx-auto w-full max-w-md" />
   return (
     <svg viewBox="0 0 440 320" role="img" aria-label={label} className="mx-auto h-auto w-full max-w-md">
+      <style>{BUBBLE_CSS}</style>
       <circle cx="220" cy="165" r="150" fill="#fff" fillOpacity=".08" />
       <circle cx="220" cy="165" r="105" fill="#fff" fillOpacity=".1" />
       {/* left phone */}
@@ -383,9 +401,9 @@ function Illustration({ label }) {
       <rect x="34" y="88" width="152" height="16" fill="#eef4ff" />
       <circle cx="56" cy="87" r="8" fill="#9db8ea" />
       <rect x="72" y="83" width="50" height="8" rx="4" fill="#9db8ea" />
-      <rect x="50" y="118" width="92" height="28" rx="14" fill="#dce6f7" />
-      <rect x="76" y="154" width="94" height="28" rx="14" fill="#1f5fd6" />
-      <rect x="50" y="190" width="66" height="28" rx="14" fill="#dce6f7" />
+      <rect className="nm-b nm-b1" x="50" y="118" width="92" height="28" rx="14" fill="#dce6f7" />
+      <rect className="nm-b nm-b2" x="76" y="154" width="94" height="28" rx="14" fill="#1f5fd6" />
+      <rect className="nm-b nm-b5" x="50" y="190" width="66" height="28" rx="14" fill="#dce6f7" />
       <rect x="48" y="244" width="124" height="22" rx="11" fill="#eef4ff" />
       {/* right phone */}
       <rect x="254" y="38" width="152" height="212" rx="24" fill="#fff" />
@@ -393,14 +411,16 @@ function Illustration({ label }) {
       <rect x="254" y="56" width="152" height="16" fill="#eef4ff" />
       <circle cx="276" cy="55" r="8" fill="#9db8ea" />
       <rect x="292" y="51" width="50" height="8" rx="4" fill="#9db8ea" />
-      <rect x="290" y="86" width="100" height="28" rx="14" fill="#1f5fd6" />
-      <rect x="270" y="122" width="88" height="28" rx="14" fill="#dce6f7" />
-      <rect x="302" y="158" width="88" height="28" rx="14" fill="#1f5fd6" />
+      <rect className="nm-b nm-b0" x="290" y="86" width="100" height="28" rx="14" fill="#1f5fd6" />
+      <rect className="nm-b nm-b3" x="270" y="122" width="88" height="28" rx="14" fill="#dce6f7" />
+      <rect className="nm-b nm-b4" x="302" y="158" width="88" height="28" rx="14" fill="#1f5fd6" />
       <rect x="268" y="212" width="124" height="22" rx="11" fill="#eef4ff" />
       {/* live link between the phones */}
-      <path d="M186 168 H254" stroke="#fff" strokeWidth="2" strokeDasharray="3 6" strokeLinecap="round" />
-      <circle cx="220" cy="168" r="22" fill="#fff" />
-      <path d="M224 154 L211 171 H219 L216 183 L229 166 H221 Z" fill="#1f5fd6" />
+      <path className="nm-dash" d="M186 168 H254" stroke="#fff" strokeWidth="2" strokeDasharray="3 6" strokeLinecap="round" />
+      <g className="nm-bolt">
+        <circle cx="220" cy="168" r="22" fill="#fff" />
+        <path d="M224 154 L211 171 H219 L216 183 L229 166 H221 Z" fill="#1f5fd6" />
+      </g>
     </svg>
   );
 }
