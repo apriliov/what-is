@@ -101,3 +101,42 @@ export const forgetRoomSecret = (room) => {
   secrets.delete(room);
   markNoPw(room, false);
 };
+
+// Owner mode (Discord admin only): the room password is also kept for this TAB only (sessionStorage),
+// so a refresh or coming back to the room does not stop at the password prompt.
+// It is wiped on logout and when the tab closes. Visitors never use this.
+const OWNER_PREFIX = 'chat:owner:';
+export const rememberOwnerSecret = (room, password) => {
+  try {
+    sessionStorage.setItem(OWNER_PREFIX + room, JSON.stringify({ pw: String(password) }));
+  } catch {
+    // storage blocked: the prompt will just appear again after a refresh
+  }
+};
+export const recallOwnerSecret = (room) => {
+  try {
+    const raw = sessionStorage.getItem(OWNER_PREFIX + room);
+    if (raw === null) return null;
+    const pw = JSON.parse(raw).pw;
+    return typeof pw === 'string' ? pw : null;
+  } catch {
+    return null;
+  }
+};
+export const dropOwnerSecret = (room) => {
+  try {
+    sessionStorage.removeItem(OWNER_PREFIX + room);
+  } catch {
+    // nothing to do
+  }
+};
+export const dropAllOwnerSecrets = () => {
+  try {
+    for (let i = sessionStorage.length - 1; i >= 0; i -= 1) {
+      const k = sessionStorage.key(i);
+      if (k && k.startsWith(OWNER_PREFIX)) sessionStorage.removeItem(k);
+    }
+  } catch {
+    // nothing to do
+  }
+};

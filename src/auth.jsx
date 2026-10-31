@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { api } from './api';
 import { navigate } from './router.jsx';
+import { dropAllOwnerSecrets } from './chatCrypto.js';
 
 const AuthContext = createContext(null);
 
@@ -12,6 +13,7 @@ export function AuthProvider({ children }) {
     try {
       const d = await api('/api/me');
       setState({ status: 'ready', loginReady: Boolean(d.loginReady), user: d.user, isAdmin: Boolean(d.isAdmin) });
+      if (!d.isAdmin) dropAllOwnerSecrets(); // owner chat memory only lives while logged in as admin
     } catch {
       // API not available (static hosting / local vite): behave as logged out.
       setState((s) => ({ ...s, status: 'ready' }));
@@ -41,6 +43,7 @@ export function AuthProvider({ children }) {
     } catch {
       // ignore, we refresh below anyway
     }
+    dropAllOwnerSecrets();
     await refresh();
     if (window.location.pathname === '/admin') navigate('/');
   }, [refresh]);
