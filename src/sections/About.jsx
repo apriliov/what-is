@@ -18,7 +18,7 @@ export default function About() {
           {items.map((item, i) => {
             const Icon = ICONS[i];
             return (
-              <div key={item.title} className="card p-6">
+              <div key={item.title} className="card card-lift p-6">
                 <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-brand-soft text-brand">
                   <Icon size={20} />
                 </span>

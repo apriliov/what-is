@@ -15,7 +15,7 @@ function Clock() {
   return <span className="tabular-nums">{formatWib(now)}</span>;
 }
 
-const lift = 'transition-transform duration-200 hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:transform-none';
+const lift = 'transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-28px_rgba(15,26,48,0.5)] motion-reduce:transition-none motion-reduce:hover:transform-none';
 
 export default function Hero() {
   const { t } = useLang();

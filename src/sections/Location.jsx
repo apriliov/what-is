@@ -35,7 +35,7 @@ export default function Location() {
         </div>
 
         <div className="mx-auto grid max-w-3xl gap-4 md:grid-cols-2">
-          <div className="card batik-corner p-6">
+          <div className="card card-lift batik-corner p-6">
             <p className="mb-2 text-sm font-medium text-mute">{t('location.clock')}</p>
             <p className="text-5xl font-extrabold tabular-nums text-brand" aria-label={`${formatWib(now)} WIB`}>
               {formatWib(now, { seconds: true })}
@@ -44,7 +44,7 @@ export default function Location() {
             <p className="mt-1 text-sm text-mute">{diffText}</p>
           </div>
 
-          <div className="card p-6">
+          <div className="card card-lift p-6">
             <dl className="divide-y divide-brand-line">
               {facts.map((f) => (
                 <div key={f.label} className="flex items-center justify-between gap-4 py-2.5 first:pt-0">

@@ -90,7 +90,7 @@ function GiveawayCard({ g, onJoin, busy, revealed, onReveal }) {
   const timeUp = open && left !== null && left <= 0;
 
   return (
-    <li className="card p-5 sm:p-6">
+    <li className="card card-lift p-5 sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="break-words text-lg font-extrabold text-ink">{g.title}</h3>
