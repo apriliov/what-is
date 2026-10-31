@@ -5,8 +5,8 @@ let clientPromise = null;
 
 export function getSupabase() {
   if (clientPromise) return clientPromise;
-  const url = import.meta.env.SUPABASE_URL;
-  const key = import.meta.env.SUPABASE_ANON_KEY;
+  const url = import.meta.env.VITE_SUPABASE_URL;
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
   if (!url || !key) {
     clientPromise = Promise.resolve(null);
     return clientPromise;
