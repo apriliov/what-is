@@ -8,8 +8,9 @@ import LangSwitch from '../components/LangSwitch';
 import { getSupabase } from '../chatClient.js';
 import {
   b64ToBytes, bytesToB64, clearRoomSecret, cryptoSupported, decryptBytes, deriveRoomKey, encryptBytes,
-  forgetRoomSecret, getRoomSecret, makeAad, setRoomSecret,
+  dropOwnerSecret, forgetRoomSecret, getRoomSecret, makeAad, recallOwnerSecret, rememberOwnerSecret, setRoomSecret,
 } from '../chatCrypto.js';
+import { useAuth } from '../auth.jsx';
 
 /* ------------------------------------------------------------------ *
  * Realtime chat, 2 people per room, on Supabase Realtime (Broadcast + Presence).
@@ -29,6 +30,18 @@ const AD_SRC = '/ads.webp';
 const AD_URL = ''; // optional: where a tap on the banner goes, e.g. 'https://example.com'. Empty = not clickable
 const MAX_BUBBLES = 50; // bubbles kept on screen
 const ROOM_RE = /^\d{1,6}$/;
+
+// Owner mode = logged in with a Discord admin account (ADMIN_DISCORD_IDS). Made for screen recording
+// and demos: the room never disconnects by itself and a refresh does not ask for the password again.
+const OWNER_FULL_TRIES = 10; // a refreshed tab can take a while to be forgotten by Presence
+const OWNER_FULL_DELAY = 2500;
+const OWNER_RETRY_MS = 3000; // reconnect delay when the connection could not be re-established
+
+// Password already known for this room: in memory (lobby / this session) or, for the owner, this tab.
+const initialSecret = (room) => {
+  const s = getRoomSecret(room);
+  return s !== null ? s : recallOwnerSecret(room);
+};
 
 // Auto cleanup: an unused room disconnects by itself so no connection (or memory) is kept alive.
 const IDLE_MS = 10 * 60 * 1000; // no activity at all
@@ -657,9 +670,9 @@ function Room({ room, T, lang }) {
   const R = T.room;
   // ask | connecting | waiting | active | left | mismatch | full | closed | idle | config | nocrypto
   // The password is kept in memory only. Without one yet (opened by link), ask first.
-  const [secret, setSecret] = useState(() => getRoomSecret(room));
+  const [secret, setSecret] = useState(() => initialSecret(room));
   const [pwDraft, setPwDraft] = useState('');
-  const [status, setStatus] = useState(() => (getRoomSecret(room) === null ? 'ask' : 'connecting'));
+  const [status, setStatus] = useState(() => (initialSecret(room) === null ? 'ask' : 'connecting'));
   const [messages, setMessages] = useState([]);
   const [toast, setToast] = useState(null);
   const [draft, setDraft] = useState('');
@@ -695,6 +708,18 @@ function Room({ room, T, lang }) {
   const touch = useCallback(() => {
     lastActive.current = Date.now();
   }, []);
+
+  // Owner mode flag lives in a ref so logging in or out never reconnects the room.
+  const { isAdmin } = useAuth();
+  const ownerMode = useRef(false);
+  useEffect(() => {
+    ownerMode.current = isAdmin;
+  }, [isAdmin]);
+
+  // Owner only: remember this room's password for the tab (see recallOwnerSecret).
+  useEffect(() => {
+    if (isAdmin && secret !== null) rememberOwnerSecret(room, secret);
+  }, [isAdmin, secret, room]);
 
   useEffect(() => () => clearRoomSecret(room), [room]);
 
@@ -771,6 +796,12 @@ function Room({ room, T, lang }) {
           failTimer = null;
           if (!alive) return;
           teardown();
+          if (ownerMode.current) {
+            // owner mode: never end on "offline", keep trying
+            setStatus('connecting');
+            retryTimer = setTimeout(connect, OWNER_RETRY_MS);
+            return;
+          }
           setStatus('closed');
         }, FAIL_MS);
       }
@@ -920,9 +951,10 @@ function Room({ room, T, lang }) {
         if (!top.includes(me)) {
           // After a refresh the old entry may still be closing. Retry briefly before giving up.
           teardown();
-          if (fullTries < 2) {
+          const owner = ownerMode.current;
+          if (fullTries < (owner ? OWNER_FULL_TRIES : 2)) {
             fullTries += 1;
-            retryTimer = setTimeout(connect, 1200);
+            retryTimer = setTimeout(connect, owner ? OWNER_FULL_DELAY : 1200);
           } else {
             setStatus('full');
           }
@@ -969,7 +1001,7 @@ function Room({ room, T, lang }) {
     };
 
     const idleTimer = setInterval(() => {
-      if (!channel) return;
+      if (!channel || ownerMode.current) return; // owner mode: no automatic disconnect
       const now = Date.now();
       if (now - lastActive.current > IDLE_MS || (hiddenSince && now - hiddenSince > HIDDEN_MS)) goIdle();
     }, 15000);
@@ -979,7 +1011,7 @@ function Room({ room, T, lang }) {
         hiddenSince = Date.now();
         return;
       }
-      if (hiddenSince && channel && Date.now() - hiddenSince > HIDDEN_MS) goIdle();
+      if (hiddenSince && channel && !ownerMode.current && Date.now() - hiddenSince > HIDDEN_MS) goIdle();
       else lastActive.current = Date.now();
       hiddenSince = 0;
     };
@@ -1105,6 +1137,7 @@ function Room({ room, T, lang }) {
 
   const changeSecret = () => {
     forgetRoomSecret(room);
+    dropOwnerSecret(room);
     setMessages([]);
     setPending(null);
     setPwDraft('');
