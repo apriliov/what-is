@@ -13,9 +13,10 @@ import Team from './sections/Team';
 import RecruitmentPage from './pages/RecruitmentPage';
 import NotFoundPage from './pages/NotFoundPage';
 import AdminPage from './pages/AdminPage';
+import Chat from './pages/Chat';
 import AnnouncementPopup from './components/AnnouncementPopup';
 import LoginNotice from './components/LoginNotice';
-import { usePath, jumpTo, isKnownPath } from './router.jsx';
+import { usePath, jumpTo, isKnownPath, isChatPath, isChatRoomPath } from './router.jsx';
 import { useReveal } from './hooks';
 import { STUDIO_NAME } from './config';
 
@@ -39,6 +40,8 @@ export default function App() {
           <RecruitmentPage />
         ) : path === '/admin' ? (
           <AdminPage />
+        ) : isChatPath(path) ? (
+          <Chat />
         ) : (
           <>
             <Hero />
@@ -53,7 +56,8 @@ export default function App() {
           </>
         )}
       </main>
-      <Footer />
+      {/* The chat room fills the screen, so it has no footer */}
+      {!isChatRoomPath(path) && <Footer />}
       {path === '/' && <AnnouncementPopup />}
       <LoginNotice />
     </div>

@@ -67,3 +67,9 @@ src/
 ## Desain
 
 Simpel dan datar: putih + biru (`#1f5fd6`), font Inter, kartu dengan border tipis. Warna diatur di `tailwind.config.js` (`brand`, `ink`, `mute`).
+
+## Chat real-time (`/chat` dan `/chat/:idroom`)
+
+Halaman chat ada di `src/pages/Chat.jsx` (lobby, ruang chat, teks EN dan ID jadi satu file).
+Butuh server WebSocket terpisah di folder `chat-server/`. Cara menjalankan dan deploy ada di `chat-server/README.md`.
+Di production isi `VITE_CHAT_WS_URL` (lihat `env.example`).

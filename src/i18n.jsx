@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { usePath, isKnownPath } from './router.jsx';
+import { usePath, isKnownPath, isChatPath, isChatRoomPath } from './router.jsx';
 import { SITE_URL } from './config';
 
 export const LANGS = ['en', 'id'];
@@ -12,6 +12,8 @@ const en = {
     notFoundTitle: 'Page not found | Namaiki Development',
     title: 'Namaiki Development | Discord bot studio from Majalengka, Indonesia',
     recruitTitle: 'Recruitment | Namaiki Development',
+    chatTitle: 'Private real-time chat | Namaiki Development',
+    chatDesc: 'Private chat for two people. Pick a room number and talk in real time. No database, nothing is saved.',
     recruitDesc: 'Join Namaiki Development. See the selection stages and open roles for Discord bot developers, web developers, designers and moderators.',
     desc: 'Namaiki Development is an independent studio from Majalengka, Indonesia. We build Discord bots and web dashboards, including Namaiki and President.',
   },
@@ -20,6 +22,7 @@ const en = {
     about: 'About',
     projects: 'Projects',
     recruitment: 'Recruitment',
+    chat: 'Chat',
     giveaway: 'Giveaway',
     team: 'Team',
     new: 'NEW!',
@@ -389,6 +392,8 @@ const id = {
     notFoundTitle: 'Halaman tidak ditemukan | Namaiki Development',
     title: 'Namaiki Development | Studio bot Discord dari Majalengka, Indonesia',
     recruitTitle: 'Rekrutmen | Namaiki Development',
+    chatTitle: 'Chat privat real-time | Namaiki Development',
+    chatDesc: 'Chat privat untuk dua orang. Pilih nomor room dan ngobrol real-time. Tanpa database, tidak ada yang disimpan.',
     recruitDesc: 'Gabung Namaiki Development. Lihat tahapan seleksi dan posisi untuk pengembang bot Discord, pengembang web, desainer, dan moderator.',
     desc: 'Namaiki Development adalah studio independen dari Majalengka, Indonesia. Kami membuat bot Discord dan dasbor web, termasuk Namaiki dan President.',
   },
@@ -397,6 +402,7 @@ const id = {
     about: 'Tentang',
     projects: 'Proyek',
     recruitment: 'Rekrutmen',
+    chat: 'Chat',
     giveaway: 'Giveaway',
     team: 'Tim',
     new: 'BARU!',
@@ -804,8 +810,9 @@ export function LangProvider({ children }) {
     const known = isKnownPath(path);
     const recruit = path === '/recruitment';
     const admin = path === '/admin';
-    const title = !known ? meta.notFoundTitle : recruit ? meta.recruitTitle : meta.title;
-    const desc = recruit ? meta.recruitDesc : meta.desc;
+    const chat = isChatPath(path);
+    const title = !known ? meta.notFoundTitle : recruit ? meta.recruitTitle : chat ? meta.chatTitle : meta.title;
+    const desc = recruit ? meta.recruitDesc : chat ? meta.chatDesc : meta.desc;
     const setMeta = (selector, value) => {
       const el = document.querySelector(selector);
       if (el) el.setAttribute('content', value);
@@ -820,9 +827,9 @@ export function LangProvider({ children }) {
     setMeta('meta[name="twitter:title"]', title);
     setMeta('meta[name="twitter:description"]', desc);
     // Unknown pages must not be indexed.
-    setMeta('meta[name="robots"]', known && !admin ? 'index, follow' : 'noindex, follow');
+    setMeta('meta[name="robots"]', known && !admin && !isChatRoomPath(path) ? 'index, follow' : 'noindex, follow');
 
-    const url = `${SITE_URL}${recruit ? '/recruitment' : '/'}`;
+    const url = `${SITE_URL}${recruit ? '/recruitment' : chat ? '/chat' : '/'}`;
     const canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) canonical.setAttribute('href', url);
     setMeta('meta[property="og:url"]', url);

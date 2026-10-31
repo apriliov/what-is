@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-// Tiny client-side router (no extra dependency). Pages: "/", "/recruitment" and "/admin".
+// Tiny client-side router (no extra dependency). Pages: "/", "/recruitment", "/admin", "/chat" and "/chat/:idroom".
 const EVENT = 'nd-navigate';
 
 const clean = (p) => p.replace(/\/+$/, '') || '/';
@@ -11,7 +11,10 @@ const currentPath = () => {
 };
 
 export const KNOWN_PATHS = ['/', '/recruitment', '/admin'];
-export const isKnownPath = (p) => KNOWN_PATHS.includes(p);
+// Chat: "/chat" is the lobby, "/chat/<room>" is a room (the Chat page validates the room number itself).
+export const isChatPath = (p) => /^\/chat(\/[^/]+)?$/.test(p);
+export const isChatRoomPath = (p) => /^\/chat\/[^/]+$/.test(p);
+export const isKnownPath = (p) => KNOWN_PATHS.includes(p) || isChatPath(p);
 
 export function navigate(to) {
   const url = new URL(to, window.location.origin);
