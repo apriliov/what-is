@@ -103,13 +103,14 @@ export default function Navbar() {
         scrolled ? 'shadow-[0_10px_30px_-20px_rgba(15,26,48,0.45)]' : ''
       }`}
     >
-      <div className="wrap flex h-16 items-center justify-between gap-4 xl:max-w-6xl">
-        <HomeLink hash="top" className="flex shrink-0 items-center gap-3" onClick={close}>
+      {/* Phone: logo and menu button. Tablet and desktop (md and up): logo | links centered | login and Discord. */}
+      <div className="wrap flex h-16 items-center justify-between gap-4 md:grid md:grid-cols-[1fr_auto_1fr] xl:max-w-6xl">
+        <HomeLink hash="top" className="flex shrink-0 items-center gap-3 md:justify-self-start" onClick={close}>
           <img src="/studio-64.webp" alt="" width="40" height="40" className="h-10 w-10 rounded-lg object-cover" />
-          <span className="whitespace-nowrap text-base font-bold text-ink lg:text-sm xl:text-base">{STUDIO_NAME}</span>
+          <span className="whitespace-nowrap text-base font-bold text-ink md:hidden lg:inline lg:text-sm xl:text-base">{STUDIO_NAME}</span>
         </HomeLink>
 
-        <nav ref={navRef} className="relative hidden items-center gap-0.5 self-stretch lg:flex xl:gap-1" aria-label={t('nav.label')}>
+        <nav ref={navRef} className="relative hidden items-center gap-1 self-stretch md:flex" aria-label={t('nav.label')}>
           {LINKS.map((link) => (
             <NavItem
               key={link.id}
@@ -123,11 +124,22 @@ export default function Navbar() {
             className="pointer-events-none absolute bottom-0 left-0 h-0.5 rounded-full bg-brand transition-[transform,width,opacity] duration-300 ease-out motion-reduce:transition-none"
             style={{ width: bar.width, transform: `translateX(${bar.left}px)`, opacity: bar.show ? 1 : 0 }}
           />
-          <AccountMenu />
-          <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary ml-1 h-10 whitespace-nowrap xl:ml-2">
-            <FaDiscord size={16} /> {t('nav.join')}
-          </a>
         </nav>
+
+        <div className="hidden items-center justify-end gap-2 md:flex">
+          <AccountMenu />
+          <a
+            href={SUPPORT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t('nav.join')}
+            title={t('nav.join')}
+            className="btn btn-primary h-10 w-10 whitespace-nowrap px-0 lg:w-auto lg:px-5"
+          >
+            <FaDiscord size={16} />
+            <span className="hidden lg:inline">{t('nav.join')}</span>
+          </a>
+        </div>
 
         <button
           type="button"
@@ -135,7 +147,7 @@ export default function Navbar() {
           aria-label={open ? t('nav.close') : t('nav.menu')}
           aria-expanded={open}
           aria-controls="mobile-menu"
-          className="flex h-11 w-11 items-center justify-center rounded-xl border border-brand-line lg:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-xl border border-brand-line md:hidden"
         >
           {open ? <FiX size={22} /> : <FiMenu size={22} />}
         </button>
@@ -144,11 +156,11 @@ export default function Navbar() {
       {open && (
         <>
         {/* Dim backdrop under the header; tapping it closes the menu */}
-        <div className="fixed inset-x-0 bottom-0 top-16 bg-ink/25 lg:hidden" onClick={close} aria-hidden="true" />
+        <div className="fixed inset-x-0 bottom-0 top-16 bg-ink/25 md:hidden" onClick={close} aria-hidden="true" />
         {/* Menu floats over the page instead of pushing the content down */}
         <div
           id="mobile-menu"
-          className="absolute inset-x-0 top-full max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-t border-brand-line bg-white shadow-[0_18px_30px_-20px_rgba(15,26,48,0.45)] lg:hidden"
+          className="absolute inset-x-0 top-full max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-t border-brand-line bg-white shadow-[0_18px_30px_-20px_rgba(15,26,48,0.45)] md:hidden"
         >
           <nav className="wrap flex flex-col py-2" aria-label={t('nav.label')}>
             {LINKS.map((link) => (

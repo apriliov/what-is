@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { FaDiscord } from 'react-icons/fa';
-import { FiLogOut, FiShield } from 'react-icons/fi';
+import { FiChevronDown, FiLogOut, FiShield } from 'react-icons/fi';
 import { useAuth } from '../auth.jsx';
 import { useLang } from '../i18n.jsx';
 import { Link } from '../router.jsx';
@@ -32,11 +32,10 @@ export default function AccountMenu({ inline = false, onNavigate }) {
         type="button"
         onClick={login}
         title={t('auth.loginLong')}
-        className={inline ? 'btn btn-outline w-full' : 'btn btn-outline ml-1 h-10 whitespace-nowrap px-3 xl:px-4'}
+        className={inline ? 'btn btn-outline w-full' : 'btn btn-outline h-10 whitespace-nowrap px-4'}
       >
         <FaDiscord size={16} />
-        <span className={inline ? '' : 'hidden xl:inline'}>{t('auth.login')}</span>
-        {!inline && <span className="sr-only xl:hidden">{t('auth.login')}</span>}
+        <span>{t('auth.login')}</span>
       </button>
     );
   }
@@ -63,16 +62,18 @@ export default function AccountMenu({ inline = false, onNavigate }) {
   }
 
   return (
-    <div ref={box} className="relative ml-1">
+    <div ref={box} className="relative">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label={`${t('auth.account')}: ${user.name}`}
-        className="flex h-10 w-10 items-center justify-center rounded-full border border-brand-line bg-brand-soft hover:border-brand"
+        className="flex h-10 max-w-[11rem] items-center gap-2 rounded-full border border-brand-line bg-brand-soft py-1 pl-1 pr-3 text-sm font-semibold text-ink transition-colors hover:border-brand lg:max-w-[14rem]"
       >
-        <img src={user.avatar} alt="" width="32" height="32" className="h-8 w-8 rounded-full" />
+        <img src={user.avatar} alt="" width="32" height="32" className="h-8 w-8 shrink-0 rounded-full" />
+        <span className="min-w-0 truncate">{user.name}</span>
+        <FiChevronDown size={16} className={`shrink-0 text-mute transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
       </button>
       {open && (
         <div role="menu" className="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-brand-line bg-white p-2 shadow-[0_18px_30px_-20px_rgba(15,26,48,0.45)]">
