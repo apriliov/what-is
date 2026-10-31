@@ -8,7 +8,7 @@ import LangSwitch from '../components/LangSwitch';
 import { getSupabase } from '../chatClient.js';
 import {
   b64ToBytes, bytesToB64, clearRoomSecret, cryptoSupported, decryptBytes, deriveRoomKey, encryptBytes,
-  getRoomSecret, makeAad, setRoomSecret,
+  forgetRoomSecret, getRoomSecret, makeAad, setRoomSecret,
 } from '../chatCrypto.js';
 
 /* ------------------------------------------------------------------ *
@@ -1024,7 +1024,7 @@ function Room({ room, T, lang }) {
   };
 
   const changeSecret = () => {
-    clearRoomSecret(room);
+    forgetRoomSecret(room);
     setMessages([]);
     setPending(null);
     setPwDraft('');
