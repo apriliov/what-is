@@ -19,6 +19,7 @@ const en = {
   },
   nav: {
     label: 'Main',
+    home: 'Home',
     about: 'About',
     projects: 'Projects',
     recruitment: 'Recruitment',
@@ -399,6 +400,7 @@ const id = {
   },
   nav: {
     label: 'Navigasi utama',
+    home: 'Beranda',
     about: 'Tentang',
     projects: 'Proyek',
     recruitment: 'Rekrutmen',
