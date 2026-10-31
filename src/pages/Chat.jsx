@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
-  FiAlertTriangle, FiArrowLeft, FiCheck, FiClock, FiCopy, FiDatabase, FiEye, FiEyeOff, FiImage, FiLock, FiRefreshCw, FiSend, FiShield, FiWifiOff, FiX, FiZap,
+  FiAlertTriangle, FiArrowLeft, FiCheck, FiClock, FiCopy, FiDatabase, FiEye, FiEyeOff, FiImage, FiLock, FiRefreshCw, FiSend, FiShield, FiUsers, FiWifiOff, FiX, FiZap,
 } from 'react-icons/fi';
 import { useLang } from '../i18n.jsx';
 import { Link, navigate, usePath } from '../router.jsx';
@@ -195,6 +195,9 @@ const TEXT = {
       joined: 'Your partner joined!',
       left: 'Your partner disconnected',
       full: 'Room is full (Maximum 2 people)',
+      fullTitle: 'Room is full',
+      fullBadge: '2 of 2 seats taken',
+      retry: 'Try again',
       fullHint: 'Two people are already chatting in room {room}. Try a different number.',
       lost: 'Connection lost',
       lostHint: 'Could not reach the chat service.',
@@ -299,6 +302,9 @@ const TEXT = {
       joined: 'Teman bergabung!',
       left: 'Teman terputus',
       full: 'Room penuh (Maksimal 2 orang)',
+      fullTitle: 'Room penuh',
+      fullBadge: '2 dari 2 kursi terisi',
+      retry: 'Coba lagi',
       fullHint: 'Sudah ada 2 orang yang mengobrol di room {room}. Coba angka lain.',
       lost: 'Koneksi terputus',
       lostHint: 'Tidak bisa terhubung ke layanan chat.',
@@ -360,7 +366,7 @@ const TEXT = {
   },
 };
 
-const COL = 'mx-auto w-full max-w-2xl px-4';
+const COL = 'w-full px-4 sm:px-6';
 
 /* ------------------------------ Lobby ------------------------------ */
 
@@ -535,6 +541,46 @@ function Notice({ icon: Icon, title, hint, children, tone = 'warn' }) {
   );
 }
 
+// "Room full" screen: centered in the page, with a seat indicator and a way to retry.
+function FullNotice({ R, room, onRetry }) {
+  const [before, after] = R.fullHint.split('{room}');
+  return (
+    <div className="fixed inset-x-0 bottom-0 top-[65px] flex items-center justify-center overflow-y-auto bg-gradient-to-b from-brand-soft to-white px-4 py-6">
+      <div
+        role="alert"
+        className="w-full max-w-md overflow-hidden rounded-3xl border border-brand-line bg-white text-center shadow-[0_28px_70px_-34px_rgba(15,26,48,0.55)]"
+      >
+        <div className="bg-gradient-to-b from-red-50 to-white px-6 pb-2 pt-9">
+          <span className="relative mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-white text-red-600 shadow-sm ring-8 ring-red-100/70">
+            <FiUsers size={32} aria-hidden="true" />
+            <span className="absolute -bottom-1 -right-1 flex h-7 min-w-[1.75rem] items-center justify-center rounded-full bg-red-600 px-1.5 text-xs font-bold text-white ring-2 ring-white">
+              2/2
+            </span>
+          </span>
+          <h1 className="mt-6 text-2xl font-extrabold text-ink">{R.fullTitle}</h1>
+          <p className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
+            <span className="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
+            {R.fullBadge}
+          </p>
+        </div>
+        <div className="px-6 pb-8 pt-4">
+          <p className="text-sm leading-relaxed text-mute">
+            {before}
+            <span className="rounded-md bg-brand-soft px-1.5 py-0.5 font-bold tracking-widest text-brand">{room}</span>
+            {after}
+          </p>
+          <div className="mt-7 flex flex-col gap-3">
+            <Link to="/chat" className="btn btn-primary h-12 w-full rounded-xl text-base">{R.other}</Link>
+            <button type="button" onClick={onRetry} className="btn btn-outline h-12 w-full rounded-xl text-base">
+              <FiRefreshCw size={16} aria-hidden="true" /> {R.retry}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const PILL = {
   connecting: { key: 'pillConnecting', dot: 'bg-amber-400' },
   waiting: { key: 'pillWaiting', dot: 'bg-amber-400' },
@@ -592,6 +638,16 @@ function Room({ room, T, lang }) {
   }, []);
 
   useEffect(() => () => clearRoomSecret(room), [room]);
+
+  // The room is pinned to the screen, so the page behind it must not scroll.
+  useEffect(() => {
+    const root = document.documentElement;
+    const prev = root.style.overflow;
+    root.style.overflow = 'hidden';
+    return () => {
+      root.style.overflow = prev;
+    };
+  }, []);
 
   // One Supabase Realtime channel per room. Presence decides who is inside (max 2).
   // Cleanup removes the channel, so leaving the page frees the seat and the connection.
@@ -1066,9 +1122,14 @@ function Room({ room, T, lang }) {
 
   if (status === 'full') {
     return (
-      <Notice icon={FiAlertTriangle} title={R.full} hint={R.fullHint.replace('{room}', room)}>
-        <Link to="/chat" className="btn btn-primary">{R.other}</Link>
-      </Notice>
+      <FullNotice
+        R={R}
+        room={room}
+        onRetry={() => {
+          setStatus('connecting');
+          setAttempt((a) => a + 1);
+        }}
+      />
     );
   }
 
@@ -1088,8 +1149,9 @@ function Room({ room, T, lang }) {
     <div
       onPointerDownCapture={touch}
       onKeyDownCapture={touch}
-      className="flex h-[calc(100dvh-65px)] flex-col bg-gradient-to-b from-brand-soft to-white"
+      className="fixed inset-x-0 bottom-0 top-[65px] bg-gradient-to-b from-brand-soft to-white md:p-5 lg:p-8"
     >
+      <div className="mx-auto flex h-full w-full max-w-3xl flex-col overflow-hidden md:rounded-3xl md:border md:border-brand-line md:bg-white md:shadow-[0_30px_80px_-40px_rgba(15,26,48,0.45)] lg:max-w-4xl">
       {/* header: two rows so nothing can overlap on a phone */}
       <div className="border-b border-brand-line bg-white shadow-[0_1px_0_rgba(15,26,48,0.02)]">
         <div className={`${COL} flex items-center gap-3 pt-3`}>
@@ -1161,7 +1223,7 @@ function Room({ room, T, lang }) {
       </div>
 
       {/* messages */}
-      <div className="relative min-h-0 flex-1">
+      <div className="relative min-h-0 flex-1 md:bg-brand-soft/40">
         {toast && (
           <div className="pointer-events-none absolute inset-x-0 top-3 z-10 flex justify-center px-4">
             <p
@@ -1231,7 +1293,7 @@ function Room({ room, T, lang }) {
               role="log"
               aria-live="polite"
               aria-label={R.messages}
-              className={`${COL} flex min-h-full flex-col justify-end gap-2 py-4`}
+              className={`${COL} flex min-h-full flex-col justify-end gap-2 py-4 md:gap-2.5 md:py-6`}
             >
               {messages.length === 0 && (
                 <div className="mx-auto my-auto max-w-xs py-10 text-center">
@@ -1245,7 +1307,7 @@ function Room({ room, T, lang }) {
               {messages.map((m) => (
                 <div key={m.id} className={`flex flex-col ${m.mine ? 'items-end' : 'items-start'}`}>
                   <div
-                    className={`max-w-[85%] whitespace-pre-wrap rounded-[1.25rem] shadow-sm ${m.img ? 'p-1.5' : 'px-4 py-2.5'} text-[15px] leading-snug [overflow-wrap:anywhere] sm:max-w-[75%] ${
+                    className={`max-w-[85%] whitespace-pre-wrap rounded-[1.25rem] shadow-sm ${m.img ? 'p-1.5' : 'px-4 py-2.5'} text-[15px] leading-snug [overflow-wrap:anywhere] sm:max-w-[75%] md:max-w-[70%] md:text-base ${
                       m.mine
                         ? 'rounded-br-md bg-brand text-white'
                         : 'rounded-bl-md border border-brand-line bg-white text-ink'
@@ -1302,7 +1364,7 @@ function Room({ room, T, lang }) {
 
       {/* composer */}
       <div className="border-t border-brand-line bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_-18px_rgba(15,26,48,0.35)]">
-        <div className={`${COL} py-3`}>
+        <div className={`${COL} pb-2 pt-3`}>
           {full && (
             <div className="mb-3 flex flex-col items-start justify-between gap-2 rounded-xl border border-brand-line bg-brand-soft px-4 py-3 sm:flex-row sm:items-center">
               <p className="text-sm text-ink">{R.limitNote}</p>
@@ -1424,6 +1486,7 @@ function Room({ room, T, lang }) {
           </div>
         </div>
       </div>
+      </div>
     </div>
   );
 }
@@ -1446,7 +1509,7 @@ export default function Chat() {
 
   if (!ROOM_RE.test(room)) {
     return (
-      <div className="h-[calc(100dvh-65px)]">
+      <div className="fixed inset-x-0 bottom-0 top-[65px] bg-white">
         <Notice icon={FiAlertTriangle} title={T.room.invalid} hint={T.room.invalidHint}>
           <Link to="/chat" className="btn btn-primary">{T.room.other}</Link>
         </Notice>
