@@ -21,6 +21,12 @@ import {
  * ------------------------------------------------------------------ */
 
 const MAX_LEN = 250; // characters per message
+
+// Ad banner: after every AD_EVERY chat bubbles, one labelled ad card is added to the conversation.
+// It only exists on this screen (never sent through the channel, never stored). Put the image in public/.
+const AD_EVERY = 10;
+const AD_SRC = '/ads.webp';
+const AD_URL = ''; // optional: where a tap on the banner goes, e.g. 'https://example.com'. Empty = not clickable
 const MAX_BUBBLES = 50; // bubbles kept on screen
 const ROOM_RE = /^\d{1,6}$/;
 
@@ -245,6 +251,8 @@ const TEXT = {
       you: 'You',
       partner: 'Partner',
       emptyTitle: 'No messages yet',
+      adLabel: 'Ad',
+      adAlt: 'Advertisement banner',
       empty: 'Nothing is saved, so a refresh clears the chat. The room closes after 10 minutes of inactivity.',
       limitNote: 'You reached 50 messages. Older ones are removed from the screen automatically.',
       restart: 'Restart chat',
@@ -352,6 +360,8 @@ const TEXT = {
       you: 'Kamu',
       partner: 'Teman',
       emptyTitle: 'Belum ada pesan',
+      adLabel: 'Iklan',
+      adAlt: 'Banner iklan',
       empty: 'Tidak ada yang disimpan, jadi refresh menghapus obrolan. Room tutup otomatis setelah 10 menit tidak aktif.',
       limitNote: 'Kamu sudah mencapai 50 pesan. Pesan lama otomatis dihapus dari layar.',
       restart: 'Restart chat',
@@ -597,6 +607,35 @@ function FullNotice({ R, room, onRetry }) {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// An ad shaped like an incoming photo bubble, but the sender line says "Ad", never "Partner".
+function AdCard({ R, caption, onLoad, onError }) {
+  const img = (
+    <img
+      src={AD_SRC}
+      alt={R.adAlt}
+      draggable={false}
+      loading="lazy"
+      onLoad={onLoad}
+      onError={onError}
+      className="block max-h-64 w-auto max-w-full rounded-xl"
+    />
+  );
+  return (
+    <div className="flex flex-col items-start">
+      <div className="max-w-[85%] rounded-[1.25rem] rounded-bl-md border border-brand-line bg-white p-1.5 shadow-sm sm:max-w-[75%] md:max-w-[70%]">
+        {AD_URL ? (
+          <a href={AD_URL} target="_blank" rel="noopener noreferrer sponsored" className="block">
+            {img}
+          </a>
+        ) : (
+          img
+        )}
+      </div>
+      <span className="mt-1 px-1 text-[11px] font-semibold text-brand">{caption}</span>
     </div>
   );
 }
@@ -981,6 +1020,27 @@ function Room({ room, T, lang }) {
     if (stickRef.current || (last && last.mine)) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
+  // Every AD_EVERY real bubbles (sent or received), add one ad card. Ads themselves are not counted.
+  const adCount = useRef(0);
+  const adSeen = useRef(0);
+  useEffect(() => {
+    let added = 0;
+    let maxId = adSeen.current;
+    messages.forEach((m) => {
+      if (m.id > adSeen.current) {
+        maxId = Math.max(maxId, m.id);
+        if (!m.ad) added += 1;
+      }
+    });
+    if (maxId === adSeen.current) return;
+    adSeen.current = maxId;
+    const before = adCount.current;
+    adCount.current += added;
+    if (Math.floor(adCount.current / AD_EVERY) > Math.floor(before / AD_EVERY)) {
+      setMessages((prev) => addMsg(prev, { id: ++seq.current, ad: true, ts: Date.now() }));
+    }
+  }, [messages]);
+
   const onScroll = () => {
     const el = listRef.current;
     if (el) stickRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
@@ -1109,6 +1169,7 @@ function Room({ room, T, lang }) {
   };
 
   const reveal = (id) => setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, shown: true } : m)));
+  const dropAd = (id) => setMessages((prev) => prev.filter((m) => m.id !== id)); // image missing: no empty card
   const dropPhoto = (id) => setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, src: null } : m)));
 
   const toggleBlock = () => {
@@ -1324,7 +1385,9 @@ function Room({ room, T, lang }) {
                   <p className="mt-1.5 text-sm leading-relaxed text-mute">{R.empty}</p>
                 </div>
               )}
-              {messages.map((m) => (
+              {messages.map((m) => (m.ad ? (
+                <AdCard key={m.id} R={R} caption={`${R.adLabel} · ${time(m.ts)}`} onLoad={stickBottom} onError={() => dropAd(m.id)} />
+              ) : (
                 <div key={m.id} className={`flex flex-col ${m.mine ? 'items-end' : 'items-start'}`}>
                   <div
                     className={`max-w-[85%] whitespace-pre-wrap rounded-[1.25rem] shadow-sm ${m.img ? 'p-1.5' : 'px-4 py-2.5'} text-[15px] leading-snug [overflow-wrap:anywhere] sm:max-w-[75%] md:max-w-[70%] md:text-base ${
@@ -1376,7 +1439,7 @@ function Room({ room, T, lang }) {
                     {m.mine ? R.you : R.partner} · {time(m.ts)}
                   </span>
                 </div>
-              ))}
+              )))}
             </div>
           </div>
         )}
