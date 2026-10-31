@@ -40,6 +40,7 @@ export default function Footer() {
     { label: t('nav.about'), hash: 'about' },
     { label: t('nav.projects'), hash: 'projects' },
     { label: t('nav.recruitment'), to: '/recruitment' },
+    { label: t('nav.chat'), to: '/chat' },
     { label: t('nav.giveaway'), hash: 'giveaway' },
     { label: t('nav.notes'), hash: 'notes' },
     { label: t('nav.location'), hash: 'location' },

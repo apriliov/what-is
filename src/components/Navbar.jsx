@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FaDiscord } from 'react-icons/fa';
 import { FiMenu, FiX } from 'react-icons/fi';
 import { useLang } from '../i18n.jsx';
-import { HomeLink, Link, usePath } from '../router.jsx';
+import { HomeLink, Link, usePath, isChatPath } from '../router.jsx';
 import LangSwitch from './LangSwitch';
 import AccountMenu from './AccountMenu';
 import { useScrollSpy } from '../hooks';
@@ -13,6 +13,9 @@ const LINKS = [
   { id: 'about' },
   { id: 'projects' },
   { id: 'recruitment', to: '/recruitment', isNew: true },
+  // Desktop nav is already full at 1024px (Indonesian labels are long), so Chat joins it from 1280px up.
+  // Below that it is in the mobile menu and the footer.
+  { id: 'chat', to: '/chat', xlOnly: true },
   { id: 'giveaway' },
   { id: 'notes' },
   { id: 'location' },
@@ -33,7 +36,7 @@ function NavItem({ link, className, onNavigate, activeId }) {
   );
 
   if (link.to) {
-    const active = path === link.to;
+    const active = link.to === '/chat' ? isChatPath(path) : path === link.to;
     return (
       <Link
         to={link.to}
@@ -81,6 +84,7 @@ export default function Navbar() {
   const spy = useScrollSpy(SPY_IDS, path);
   let activeId = '';
   if (path === '/recruitment') activeId = 'recruitment';
+  else if (isChatPath(path)) activeId = 'chat';
   else if (pastHero) activeId = spy;
 
   // Sliding underline under the active menu item (desktop).
@@ -115,7 +119,7 @@ export default function Navbar() {
         scrolled ? 'shadow-[0_10px_30px_-20px_rgba(15,26,48,0.45)]' : ''
       }`}
     >
-      <div className="wrap flex h-16 items-center justify-between gap-4">
+      <div className="wrap flex h-16 items-center justify-between gap-4 xl:max-w-6xl">
         <HomeLink hash="top" className="flex shrink-0 items-center gap-3" onClick={close}>
           <img src="/studio-64.webp" alt="" width="40" height="40" className="h-10 w-10 rounded-lg object-cover" />
           <span className="whitespace-nowrap text-base font-bold text-ink lg:text-sm xl:text-base">{STUDIO_NAME}</span>
@@ -127,7 +131,9 @@ export default function Navbar() {
               key={link.id}
               link={link}
               activeId={activeId}
-              className="whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium text-mute hover:text-brand xl:px-3"
+              className={`whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium text-mute hover:text-brand xl:px-3 ${
+                link.xlOnly ? 'hidden xl:block' : ''
+              }`}
             />
           ))}
           <span
