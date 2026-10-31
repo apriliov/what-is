@@ -25,7 +25,7 @@ function DateTime() {
   );
 }
 
-const lift = 'transition-transform duration-200 hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:transform-none';
+const lift = 'transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-28px_rgba(15,26,48,0.5)] motion-reduce:transition-none motion-reduce:hover:transform-none';
 
 // Overlaps the blue hero band, same idea as the tiles on the home page.
 export default function RecruitStats() {

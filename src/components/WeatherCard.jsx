@@ -118,7 +118,7 @@ export default function WeatherCard() {
   }
 
   return (
-    <div className="card p-6 md:col-span-2">
+    <div className="card card-lift p-6 md:col-span-2">
       <div className="mb-5 flex items-center justify-between gap-3">
         <p className="text-sm font-medium text-mute">{t('weather.title')}</p>
         <a
