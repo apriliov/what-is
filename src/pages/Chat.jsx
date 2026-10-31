@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
-  FiAlertTriangle, FiArrowLeft, FiCheck, FiClock, FiCopy, FiDatabase, FiEyeOff, FiImage, FiLock, FiRefreshCw, FiSend, FiShield, FiWifiOff, FiX, FiZap,
+  FiAlertTriangle, FiArrowLeft, FiCheck, FiClock, FiCopy, FiDatabase, FiEye, FiEyeOff, FiImage, FiLock, FiRefreshCw, FiSend, FiShield, FiWifiOff, FiX, FiZap,
 } from 'react-icons/fi';
 import { useLang } from '../i18n.jsx';
 import { Link, navigate, usePath } from '../router.jsx';
 import LangSwitch from '../components/LangSwitch';
 import { getSupabase } from '../chatClient.js';
+import {
+  b64ToBytes, bytesToB64, clearRoomSecret, cryptoSupported, decryptBytes, deriveRoomKey, encryptBytes,
+  getRoomSecret, makeAad, setRoomSecret,
+} from '../chatCrypto.js';
 
 /* ------------------------------------------------------------------ *
  * Realtime chat, 2 people per room, on Supabase Realtime (Broadcast + Presence).
@@ -13,6 +17,7 @@ import { getSupabase } from '../chatClient.js';
  *   /chat/:idroom  -> the room
  * No tables and no SQL: messages are never stored, they only pass through Supabase
  * and live in this component's state. A room exists only while someone is connected.
+ * Messages and photos are encrypted in the browser with the room password (chatCrypto.js).
  * ------------------------------------------------------------------ */
 
 const MAX_LEN = 250; // characters per message
@@ -57,6 +62,12 @@ const MAX_IMAGES = 6; // photos kept in memory, older ones turn into a placehold
 const IMG_SEND_GAP = 10 * 1000; // one photo per 10 s
 const IMG_RECV_GAP = 5 * 1000; // receiving side is a little more lenient (clock jitter)
 const B64_RE = /^[A-Za-z0-9+/]+={0,2}$/;
+
+// Encryption (see chatCrypto.js): size limits for what arrives, and the IV length in base64
+const MAX_CT_TEXT = 2000; // base64 characters of one encrypted text message
+const IV_B64_LEN = 16; // 12 random bytes
+const textEnc = new TextEncoder();
+const textDec = new TextDecoder();
 
 // Only a plain JPEG of sane size is accepted from the other side. PNG, SVG, GIF and the rest are dropped.
 const validPhoto = (b64) =>
@@ -165,6 +176,11 @@ const TEXT = {
       hint: 'No room yet? Type any number and it is created for you. Share the same number with your friend.',
       button: 'Create or Join Room',
       errEmpty: 'Enter a number with 1 to 6 digits.',
+      pwLabel: 'Room password (optional)',
+      pwPlaceholder: 'Same password for both of you',
+      pwHint: 'Messages and photos are encrypted on your device with this password. Share it separately, it is never put in the link.',
+      pwShow: 'Show password',
+      pwHide: 'Hide password',
       illustration: 'Two phones exchanging chat messages',
     },
     room: {
@@ -201,6 +217,20 @@ const TEXT = {
       photosBlocked: 'Incoming photos blocked',
       photosAllowed: 'Incoming photos allowed',
       privacyLine: 'No login · Chats are never saved to a database',
+      e2e: 'Encrypted',
+      e2eTitle: 'End-to-end encrypted with your room password',
+      noE2e: 'No password',
+      noE2eTitle: 'No password: anyone who knows the room number could read this chat',
+      askTitle: 'Room password',
+      askHint: 'Enter the password you agreed on with your friend. Leave it empty if this room has no password.',
+      askLabel: 'Password',
+      askJoin: 'Join room',
+      mismatch: 'Different password',
+      mismatchHint: 'Your partner uses another password, so messages cannot be read. Change yours to match.',
+      changePw: 'Change password',
+      pillMismatch: 'Different password',
+      noCrypto: 'Encryption is not available',
+      noCryptoHint: 'Open this page over HTTPS in an up-to-date browser to use the chat.',
       reconnect: 'Reconnect',
       invalid: 'Invalid room number',
       invalidHint: 'A room number has 1 to 6 digits, for example 123456.',
@@ -247,6 +277,11 @@ const TEXT = {
       hint: 'Belum punya room? Ketik angka apa saja, room dibuat otomatis. Bagikan angka yang sama ke temanmu.',
       button: 'Create or Join Room',
       errEmpty: 'Masukkan angka 1 sampai 6 digit.',
+      pwLabel: 'Password room (opsional)',
+      pwPlaceholder: 'Password yang sama untuk kalian berdua',
+      pwHint: 'Pesan dan foto dienkripsi di perangkatmu memakai password ini. Bagikan terpisah, password tidak dimasukkan ke link.',
+      pwShow: 'Tampilkan password',
+      pwHide: 'Sembunyikan password',
       illustration: 'Dua ponsel saling berkirim pesan',
     },
     room: {
@@ -283,6 +318,20 @@ const TEXT = {
       photosBlocked: 'Foto masuk diblokir',
       photosAllowed: 'Foto masuk diizinkan',
       privacyLine: 'Tanpa login · Chat tidak disimpan di database',
+      e2e: 'Terenkripsi',
+      e2eTitle: 'Terenkripsi ujung ke ujung dengan password room',
+      noE2e: 'Tanpa password',
+      noE2eTitle: 'Tanpa password: siapa pun yang tahu nomor room bisa membaca chat ini',
+      askTitle: 'Password room',
+      askHint: 'Masukkan password yang kalian sepakati. Kosongkan kalau room ini tidak memakai password.',
+      askLabel: 'Password',
+      askJoin: 'Masuk room',
+      mismatch: 'Password berbeda',
+      mismatchHint: 'Lawan bicara memakai password lain, jadi pesan tidak bisa terbaca. Samakan password kamu.',
+      changePw: 'Ganti password',
+      pillMismatch: 'Password berbeda',
+      noCrypto: 'Enkripsi tidak tersedia',
+      noCryptoHint: 'Buka halaman ini lewat HTTPS dengan browser yang terbaru untuk memakai chat.',
       reconnect: 'Hubungkan lagi',
       invalid: 'Nomor room tidak valid',
       invalidHint: 'Nomor room terdiri dari 1 sampai 6 digit angka, contoh 123456.',
@@ -348,6 +397,8 @@ function Lobby({ T }) {
   const L = T.home;
   const [value, setValue] = useState('');
   const [error, setError] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
   const inputRef = useRef(null);
 
   const submit = (e) => {
@@ -357,6 +408,7 @@ function Lobby({ T }) {
       inputRef.current?.focus();
       return;
     }
+    setRoomSecret(value, password.trim()); // kept in memory only, never put in the URL
     navigate(`/chat/${value}`);
   };
 
@@ -408,6 +460,31 @@ function Lobby({ T }) {
           <p id="room-hint" className={`mt-2 text-sm ${error ? 'font-medium text-red-600' : 'text-mute'}`} role={error ? 'alert' : undefined}>
             {error ? L.errEmpty : L.hint}
           </p>
+          <label htmlFor="room-pw" className="mt-5 block text-sm font-semibold text-ink">{L.pwLabel}</label>
+          <div className="relative mt-2">
+            <input
+              id="room-pw"
+              type={showPw ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value.slice(0, 64))}
+              autoComplete="off"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder={L.pwPlaceholder}
+              aria-describedby="pw-hint"
+              className="h-12 w-full rounded-xl border border-brand-line bg-brand-soft pl-4 pr-12 text-base text-ink placeholder:text-mute/50 focus:border-brand focus:bg-white"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPw((v) => !v)}
+              aria-label={showPw ? L.pwHide : L.pwShow}
+              className="absolute right-1 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-mute hover:text-brand"
+            >
+              {showPw ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+            </button>
+          </div>
+          <p id="pw-hint" className="mt-2 text-sm text-mute">{L.pwHint}</p>
           <button type="submit" className="btn btn-primary mt-5 h-12 w-full text-base">
             {L.button}
           </button>
@@ -460,12 +537,18 @@ const PILL = {
   closed: { key: 'pillOffline', dot: 'bg-red-500' },
   idle: { key: 'pillOffline', dot: 'bg-red-500' },
   config: { key: 'pillOffline', dot: 'bg-red-500' },
+  nocrypto: { key: 'pillOffline', dot: 'bg-red-500' },
+  ask: { key: 'pillWaiting', dot: 'bg-amber-400' },
+  mismatch: { key: 'pillMismatch', dot: 'bg-amber-400' },
 };
 
 function Room({ room, T, lang }) {
   const R = T.room;
-  // connecting | waiting | active | left | full | closed | idle | config
-  const [status, setStatus] = useState('connecting');
+  // ask | connecting | waiting | active | left | mismatch | full | closed | idle | config | nocrypto
+  // The password is kept in memory only. Without one yet (opened by link), ask first.
+  const [secret, setSecret] = useState(() => getRoomSecret(room));
+  const [pwDraft, setPwDraft] = useState('');
+  const [status, setStatus] = useState(() => (getRoomSecret(room) === null ? 'ask' : 'connecting'));
   const [messages, setMessages] = useState([]);
   const [toast, setToast] = useState(null);
   const [draft, setDraft] = useState('');
@@ -477,6 +560,9 @@ function Room({ room, T, lang }) {
 
   const channelRef = useRef(null);
   const blockRef = useRef(false);
+  const keyRef = useRef(null); // AES key, only while connected
+  const sendN = useRef(0); // message counter, bound into every encrypted message
+  const sendChain = useRef(Promise.resolve()); // keeps encrypted messages in order
   const fileRef = useRef(null);
   const myId = useRef(null);
   const peerRef = useRef(null);
@@ -499,9 +585,12 @@ function Room({ room, T, lang }) {
     lastActive.current = Date.now();
   }, []);
 
+  useEffect(() => () => clearRoomSecret(room), [room]);
+
   // One Supabase Realtime channel per room. Presence decides who is inside (max 2).
   // Cleanup removes the channel, so leaving the page frees the seat and the connection.
   useEffect(() => {
+    if (secret === null) return undefined; // waiting for the password prompt
     let alive = true;
     let sb = null;
     let channel = null;
@@ -515,17 +604,23 @@ function Room({ room, T, lang }) {
     let strikes = 0;
     let mutedUntil = 0;
     let lastImgAt = 0;
+    let derived = null;
+    let myKc = null;
+    let recvChain = Promise.resolve();
+    const lastN = { id: null, n: 0 };
 
     const me = newId();
     myId.current = me;
     peerRef.current = null;
     lastActive.current = Date.now();
+    sendN.current = 0;
 
     const teardown = () => {
       clearTimeout(failTimer);
       failTimer = null;
       wasActive = false;
       peerRef.current = null;
+      keyRef.current = null;
       const ch = channel;
       channel = null;
       channelRef.current = null;
@@ -569,32 +664,70 @@ function Room({ room, T, lang }) {
       }
     };
 
+    const enqueue = (fn) => {
+      recvChain = recvChain.then(fn).catch(() => {});
+    };
+
+    // Cheap checks first, so no decryption work is spent on junk.
+    const accept = (payload, maxCt) =>
+      !!payload &&
+      typeof payload === 'object' &&
+      typeof payload.from === 'string' &&
+      payload.from === peerRef.current && // only the other member of this room
+      typeof payload.iv === 'string' &&
+      payload.iv.length === IV_B64_LEN &&
+      typeof payload.ct === 'string' &&
+      payload.ct.length >= 24 &&
+      payload.ct.length <= maxCt &&
+      Number.isSafeInteger(payload.n) &&
+      payload.n >= 1;
+
+    // Decrypts one message. Returns null for a wrong key, a changed message or a replay.
+    const open = async (payload, kind) => {
+      const key = keyRef.current;
+      if (!key) return null;
+      if (lastN.id !== payload.from) {
+        lastN.id = payload.from;
+        lastN.n = 0;
+      }
+      if (payload.n <= lastN.n) return null; // replayed or out of order
+      try {
+        const bytes = await decryptBytes(key, makeAad(room, payload.from, kind, payload.n), payload.iv, payload.ct);
+        lastN.n = payload.n;
+        return bytes;
+      } catch {
+        return null;
+      }
+    };
+
     const onIncoming = (payload) => {
       const now = Date.now();
-      if (!payload || typeof payload !== 'object') return;
-      // only accept the other member of this room
-      if (typeof payload.from !== 'string' || payload.from !== peerRef.current) return;
-      if (typeof payload.text !== 'string') return;
-      if (now < mutedUntil) return;
+      if (!accept(payload, MAX_CT_TEXT) || now < mutedUntil) return;
       recvTimes = recvTimes.filter((t) => now - t < SEND_WINDOW);
       if (recvTimes.length >= RECV_BURST) {
         strike(now);
         return;
       }
-      const text = clean(payload.text);
-      if (!text || text.length > MAX_LEN) return;
       recvTimes.push(now);
-      lastActive.current = now;
-      // Only the newest MAX_BUBBLES bubbles stay in memory and on screen.
-      setMessages((prev) => addMsg(prev, { id: ++seq.current, mine: false, text, ts: now }));
+      enqueue(async () => {
+        const bytes = await open(payload, 'm');
+        if (!bytes) {
+          strike(Date.now());
+          return;
+        }
+        const text = clean(textDec.decode(bytes));
+        if (!text || text.length > MAX_LEN) return;
+        const at = Date.now();
+        lastActive.current = at;
+        // Only the newest MAX_BUBBLES bubbles stay in memory and on screen.
+        setMessages((prev) => addMsg(prev, { id: ++seq.current, mine: false, text, ts: at }));
+      });
     };
 
     const onIncomingPhoto = (payload) => {
       const now = Date.now();
-      if (!payload || typeof payload !== 'object') return;
-      if (typeof payload.from !== 'string' || payload.from !== peerRef.current) return;
-      if (blockRef.current || now < mutedUntil) return;
-      if (!validPhoto(payload.img)) return;
+      if (blockRef.current) return; // blocked photos are dropped before any decryption
+      if (!accept(payload, MAX_IMG_B64 + 200) || now < mutedUntil) return;
       recvTimes = recvTimes.filter((t) => now - t < SEND_WINDOW);
       if (recvTimes.length >= RECV_BURST || now - lastImgAt < IMG_RECV_GAP) {
         strike(now);
@@ -602,10 +735,18 @@ function Room({ room, T, lang }) {
       }
       lastImgAt = now;
       recvTimes.push(now);
-      lastActive.current = now;
-      setMessages((prev) =>
-        addMsg(prev, { id: ++seq.current, mine: false, img: true, src: PHOTO_PREFIX + payload.img, ts: now })
-      );
+      enqueue(async () => {
+        const bytes = await open(payload, 'i');
+        if (!bytes) {
+          strike(Date.now());
+          return;
+        }
+        const b64 = bytesToB64(bytes);
+        if (!validPhoto(b64)) return; // must be a plain JPEG of sane size
+        const at = Date.now();
+        lastActive.current = at;
+        setMessages((prev) => addMsg(prev, { id: ++seq.current, mine: false, img: true, src: PHOTO_PREFIX + b64, ts: at }));
+      });
     };
 
     const connect = async () => {
@@ -621,6 +762,21 @@ function Room({ room, T, lang }) {
         setStatus('config');
         return;
       }
+      if (!derived) {
+        if (!cryptoSupported()) {
+          setStatus('nocrypto');
+          return;
+        }
+        try {
+          derived = await deriveRoomKey(room, secret);
+        } catch {
+          if (alive) setStatus('nocrypto');
+          return;
+        }
+        if (!alive) return;
+      }
+      keyRef.current = derived.key;
+      myKc = derived.kc;
 
       const joinedAt = Date.now();
       const ch = sb.channel(`chat:${room}`, {
@@ -654,6 +810,14 @@ function Room({ room, T, lang }) {
 
         fullTries = 0;
         const peer = top.find((k) => k !== me) || null;
+        const peerKc = peer && state[peer] && state[peer][0] ? state[peer][0].kc : null;
+        if (peer && peerKc !== myKc) {
+          // the other person typed a different password: nothing could be read, so say so
+          peerRef.current = null;
+          wasActive = false;
+          setStatus('mismatch');
+          return;
+        }
         peerRef.current = peer;
         if (peer) {
           if (!wasActive) notify('joined', 'ok');
@@ -676,7 +840,7 @@ function Room({ room, T, lang }) {
         if (s === 'SUBSCRIBED') {
           clearTimeout(failTimer);
           failTimer = null;
-          Promise.resolve(ch.track({ at: joinedAt })).catch(() => onConnLost(ch));
+          Promise.resolve(ch.track({ at: joinedAt, kc: myKc })).catch(() => onConnLost(ch));
         } else if (s === 'CHANNEL_ERROR' || s === 'TIMED_OUT' || s === 'CLOSED') {
           onConnLost(ch);
         }
@@ -717,7 +881,7 @@ function Room({ room, T, lang }) {
       window.removeEventListener('pageshow', onShow);
       teardown();
     };
-  }, [room, attempt, notify]);
+  }, [room, attempt, notify, secret]);
 
   useEffect(
     () => () => {
@@ -759,7 +923,7 @@ function Room({ room, T, lang }) {
   const send = () => {
     const text = clean(draft);
     const ch = channelRef.current;
-    if (!active || !text || text.length > MAX_LEN || !ch) return;
+    if (!active || !text || text.length > MAX_LEN || !ch || !keyRef.current) return;
     const now = Date.now();
     const log = sendLog.current;
     log.times = log.times.filter((t) => now - t < SEND_WINDOW);
@@ -777,7 +941,33 @@ function Room({ room, T, lang }) {
     touch();
     setDraft('');
     setMessages((prev) => addMsg(prev, { id: ++seq.current, mine: true, text, ts: now }));
-    Promise.resolve(ch.send({ type: 'broadcast', event: 'msg', payload: { from: myId.current, text } })).catch(() => {});
+    const n = (sendN.current += 1);
+    const key = keyRef.current;
+    const from = myId.current;
+    sendChain.current = sendChain.current
+      .then(async () => {
+        const { iv, ct } = await encryptBytes(key, makeAad(room, from, 'm', n), textEnc.encode(text));
+        await ch.send({ type: 'broadcast', event: 'msg', payload: { from, n, iv, ct } });
+      })
+      .catch(() => {});
+  };
+
+  const joinWithPassword = (e) => {
+    e.preventDefault();
+    const pw = pwDraft.trim();
+    setRoomSecret(room, pw);
+    setPwDraft('');
+    setStatus('connecting');
+    setSecret(pw);
+  };
+
+  const changeSecret = () => {
+    clearRoomSecret(room);
+    setMessages([]);
+    setPending(null);
+    setPwDraft('');
+    setStatus('ask');
+    setSecret(null);
   };
 
   const stickBottom = () => {
@@ -810,7 +1000,7 @@ function Room({ room, T, lang }) {
 
   const sendPhoto = () => {
     const ch = channelRef.current;
-    if (!pending || !active || !ch) return;
+    if (!pending || !active || !ch || !keyRef.current) return;
     const now = Date.now();
     const log = sendLog.current;
     log.times = log.times.filter((t) => now - t < SEND_WINDOW);
@@ -825,7 +1015,15 @@ function Room({ room, T, lang }) {
     const b64 = pending;
     setPending(null);
     setMessages((prev) => addMsg(prev, { id: ++seq.current, mine: true, img: true, src: PHOTO_PREFIX + b64, ts: now }));
-    Promise.resolve(ch.send({ type: 'broadcast', event: 'img', payload: { from: myId.current, img: b64 } })).catch(() => {});
+    const n = (sendN.current += 1);
+    const key = keyRef.current;
+    const from = myId.current;
+    sendChain.current = sendChain.current
+      .then(async () => {
+        const { iv, ct } = await encryptBytes(key, makeAad(room, from, 'i', n), b64ToBytes(b64));
+        await ch.send({ type: 'broadcast', event: 'img', payload: { from, n, iv, ct } });
+      })
+      .catch(() => {});
   };
 
   const reveal = (id) => setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, shown: true } : m)));
@@ -876,6 +1074,9 @@ function Room({ room, T, lang }) {
   if (status === 'connecting') banner = { text: R.connecting };
   else if (status === 'waiting') banner = { text: R.waiting };
   else if (status === 'left') banner = { title: R.left, text: R.waiting };
+  else if (status === 'mismatch') {
+    banner = { title: R.mismatch, text: R.mismatchHint, action: { label: R.changePw, onClick: changeSecret } };
+  }
 
   return (
     <div
@@ -901,6 +1102,14 @@ function Room({ room, T, lang }) {
             <p className="flex items-center gap-1.5 text-xs text-mute">
               <span className={`h-2 w-2 rounded-full ${pill.dot}`} aria-hidden="true" />
               {R[pill.key]}
+              {secret !== null && (
+                <>
+                  <span className="text-mute/50" aria-hidden="true">·</span>
+                  <span title={secret ? R.e2eTitle : R.noE2eTitle} className={`flex items-center gap-1 ${secret ? '' : 'text-amber-700'}`}>
+                    <FiLock size={11} aria-hidden="true" /> {secret ? R.e2e : R.noE2e}
+                  </span>
+                </>
+              )}
             </p>
           </div>
           <button
@@ -945,7 +1154,38 @@ function Room({ room, T, lang }) {
           </div>
         )}
 
-        {status === 'config' ? (
+        {status === 'ask' ? (
+          <div className="flex h-full items-center justify-center px-5">
+            <form
+              onSubmit={joinWithPassword}
+              className="w-full max-w-md rounded-2xl border border-brand-line bg-white px-6 py-8 shadow-[0_24px_50px_-30px_rgba(15,26,48,0.5)]"
+            >
+              <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-soft text-brand">
+                <FiLock size={26} aria-hidden="true" />
+              </span>
+              <h1 className="mt-5 text-center text-xl font-extrabold text-ink">{R.askTitle}</h1>
+              <p className="mt-2 text-center text-sm leading-relaxed text-mute">{R.askHint}</p>
+              <label htmlFor="room-pw-ask" className="sr-only">{R.askLabel}</label>
+              <input
+                id="room-pw-ask"
+                type="password"
+                value={pwDraft}
+                onChange={(e) => setPwDraft(e.target.value.slice(0, 64))}
+                autoComplete="off"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
+                placeholder={R.askLabel}
+                className="mt-5 h-12 w-full rounded-xl border border-brand-line bg-brand-soft px-4 text-base text-ink placeholder:text-mute/50 focus:border-brand focus:bg-white"
+              />
+              <button type="submit" className="btn btn-primary mt-4 h-12 w-full text-base">{R.askJoin}</button>
+            </form>
+          </div>
+        ) : status === 'nocrypto' ? (
+          <Notice icon={FiAlertTriangle} title={R.noCrypto} hint={R.noCryptoHint}>
+            <Link to="/chat" className="btn btn-outline">{R.other}</Link>
+          </Notice>
+        ) : status === 'config' ? (
           <Notice icon={FiAlertTriangle} title={R.notConfigured} hint={R.notConfiguredHint}>
             <Link to="/chat" className="btn btn-outline">{R.other}</Link>
           </Notice>
@@ -1062,6 +1302,11 @@ function Room({ room, T, lang }) {
                 {banner.title && <strong className="block font-bold">{banner.title}</strong>}
                 {banner.text}
               </span>
+              {banner.action && (
+                <button type="button" onClick={banner.action.onClick} className="btn btn-outline ml-auto h-8 shrink-0 px-3 text-sm">
+                  {banner.action.label}
+                </button>
+              )}
             </div>
           )}
 
