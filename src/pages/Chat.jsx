@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
-  FiAlertTriangle, FiArrowLeft, FiCheck, FiClock, FiCopy, FiDatabase, FiEyeOff, FiImage, FiRefreshCw, FiSend, FiShield, FiWifiOff, FiX, FiZap,
+  FiAlertTriangle, FiArrowLeft, FiCheck, FiClock, FiCopy, FiDatabase, FiEyeOff, FiImage, FiLock, FiRefreshCw, FiSend, FiShield, FiWifiOff, FiX, FiZap,
 } from 'react-icons/fi';
 import { useLang } from '../i18n.jsx';
 import { Link, navigate, usePath } from '../router.jsx';
@@ -147,8 +147,8 @@ const TEXT = {
         'Pick a number, share it with one person and start talking. Nothing is saved, not in a database and not on the server.',
       features: [
         {
-          title: 'No database',
-          desc: 'Messages only pass through memory. Refresh the page and the whole conversation is gone for good.',
+          title: 'No login, no database',
+          desc: 'Nobody signs up and nothing is stored. Messages and photos only pass through memory, and a refresh erases the whole conversation.',
         },
         {
           title: 'Fast',
@@ -156,7 +156,7 @@ const TEXT = {
         },
         {
           title: 'Secure',
-          desc: 'Only 2 people fit in a room, the connection is encrypted (WSS) and no account is needed.',
+          desc: 'Only 2 people fit in a room and the connection is encrypted (WSS).',
         },
       ],
       formTitle: 'Start a chat',
@@ -200,6 +200,7 @@ const TEXT = {
       unblockPhotos: 'Allow incoming photos',
       photosBlocked: 'Incoming photos blocked',
       photosAllowed: 'Incoming photos allowed',
+      privacyLine: 'No login · Chats are never saved to a database',
       reconnect: 'Reconnect',
       invalid: 'Invalid room number',
       invalidHint: 'A room number has 1 to 6 digits, for example 123456.',
@@ -208,7 +209,7 @@ const TEXT = {
       send: 'Send',
       you: 'You',
       partner: 'Partner',
-      empty: 'No messages yet. Nothing is saved, so a refresh clears everything. Rooms close by themselves after 10 minutes of inactivity.',
+      empty: 'No messages yet. No login needed and nothing is saved to a database, so a refresh clears everything. Rooms close by themselves after 10 minutes of inactivity.',
       limitNote: 'You reached 50 messages. Older ones are removed from the screen automatically.',
       restart: 'Restart chat',
       rate: 'Slow down a little.',
@@ -228,8 +229,8 @@ const TEXT = {
         'Pilih satu angka, bagikan ke satu orang, lalu mulai ngobrol. Tidak ada yang disimpan, baik di database maupun di server.',
       features: [
         {
-          title: 'Tanpa Database',
-          desc: 'Pesan hanya lewat di memori. Refresh halaman dan seluruh obrolan hilang permanen.',
+          title: 'Tanpa login, tanpa database',
+          desc: 'Tidak perlu daftar dan tidak ada yang disimpan. Pesan dan foto hanya lewat di memori, refresh halaman menghapus seluruh obrolan.',
         },
         {
           title: 'Cepat',
@@ -237,7 +238,7 @@ const TEXT = {
         },
         {
           title: 'Aman',
-          desc: 'Satu room hanya muat 2 orang, koneksinya terenkripsi (WSS) dan tidak perlu akun.',
+          desc: 'Satu room hanya muat 2 orang dan koneksinya terenkripsi (WSS).',
         },
       ],
       formTitle: 'Mulai ngobrol',
@@ -281,6 +282,7 @@ const TEXT = {
       unblockPhotos: 'Izinkan foto masuk',
       photosBlocked: 'Foto masuk diblokir',
       photosAllowed: 'Foto masuk diizinkan',
+      privacyLine: 'Tanpa login · Chat tidak disimpan di database',
       reconnect: 'Hubungkan lagi',
       invalid: 'Nomor room tidak valid',
       invalidHint: 'Nomor room terdiri dari 1 sampai 6 digit angka, contoh 123456.',
@@ -289,7 +291,7 @@ const TEXT = {
       send: 'Kirim',
       you: 'Kamu',
       partner: 'Lawan',
-      empty: 'Belum ada pesan. Tidak ada yang disimpan, jadi refresh akan menghapus semuanya. Room tertutup otomatis setelah 10 menit tidak aktif.',
+      empty: 'Belum ada pesan. Tanpa login dan tidak ada yang disimpan di database, jadi refresh akan menghapus semuanya. Room tertutup otomatis setelah 10 menit tidak aktif.',
       limitNote: 'Kamu sudah mencapai 50 pesan. Pesan lama otomatis dihapus dari layar.',
       restart: 'Restart chat',
       rate: 'Pelan-pelan dulu.',
@@ -743,7 +745,9 @@ function Room({ room, T, lang }) {
     const el = boxRef.current;
     if (!el) return;
     el.style.height = 'auto';
-    el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+    const h = el.scrollHeight + 2; // + border
+    el.style.height = `${Math.min(h, 120)}px`;
+    el.style.overflowY = h > 120 ? 'auto' : 'hidden'; // no scrollbar popping in and out
   }, [draft]);
 
   const active = status === 'active';
@@ -1120,13 +1124,8 @@ function Room({ room, T, lang }) {
                 enterKeyHint="send"
                 autoComplete="off"
                 placeholder={locked ? R.waiting : R.placeholder}
-                className="block max-h-[120px] min-h-[44px] w-full resize-none rounded-xl border border-brand-line bg-brand-soft px-4 py-2.5 text-[15px] leading-snug text-ink placeholder:text-mute/70 focus:border-brand focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="block max-h-[120px] min-h-[44px] w-full resize-none overflow-y-hidden rounded-xl border border-brand-line bg-brand-soft px-4 py-2.5 text-base leading-snug text-ink placeholder:text-mute/70 focus:border-brand focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
               />
-              {draft.length > 0 && (
-                <p className={`mt-1 px-1 text-right text-[11px] ${draft.length >= MAX_LEN ? 'font-bold text-red-600' : 'text-mute'}`}>
-                  {draft.length}/{MAX_LEN} {R.chars}
-                </p>
-              )}
             </div>
             <button
               type="submit"
@@ -1138,6 +1137,18 @@ function Room({ room, T, lang }) {
               <FiSend size={18} />
             </button>
           </form>
+          <div className="mt-1.5 flex h-4 items-center justify-between gap-3 text-[11px] text-mute">
+            <span className="flex min-w-0 items-center gap-1">
+              <FiLock size={11} className="shrink-0" aria-hidden="true" />
+              <span className="truncate">{R.privacyLine}</span>
+            </span>
+            <span
+              className={`min-w-[3.5rem] shrink-0 text-right tabular-nums ${draft.length >= MAX_LEN ? 'font-bold text-red-600' : ''}`}
+              aria-live="off"
+            >
+              {draft.length > 0 ? `${draft.length}/${MAX_LEN}` : ''}
+            </span>
+          </div>
         </div>
       </div>
     </div>
