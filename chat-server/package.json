@@ -1,0 +1,16 @@
+{
+  "name": "namaiki-chat-server",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Realtime 2-person chat rooms. In-memory only: no database, no message history.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.mjs"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
